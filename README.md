@@ -1,7 +1,7 @@
 # IAP Validator
 
 - [Installation](#installation)
-- [Configuation](#configuation)
+- [Configuration](#configuration)
 - [Run IAP Validator](#run-iap-validator)
 - [Google](#google)
 - [Testing](#testing)
