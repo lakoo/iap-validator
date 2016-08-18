@@ -1,10 +1,10 @@
-# Subscription Validator
+# IAP Validator
 
-- [Installation](#Installation)
-- [Configuation](#Configuation)
-- [Run Subscription Validator](#Run-Subscription-Validator)
-- [Google](#Google)
-- [Testing](#Testing)
+- [Installation](#installation)
+- [Configuation](#configuation)
+- [Run IAP Validator](#run-iap-validator)
+- [Google](#google)
+- [Testing](#testing)
 
 ## Installation
 
@@ -16,9 +16,9 @@ npm install
 
 ## Configuration
 
-Create a `config.js` file for the configuration of subscription validator, see [config.js.sample](./config.js.sample)
+Create a `config.js` file for the configuration of IAP validator, see [config.js.sample](./config.js.sample)
 
-## Run Subscription Validator
+## Run IAP Validator
 
 ```bash
 node app.js
@@ -26,7 +26,7 @@ node app.js
 
 ## Google
 
-To see more technical details, please see [Purchase.subscriptions](https://developers.google.com/android-publisher/api-ref/purchases/subscriptions) from [Goolge Play Developer API](https://developers.google.com/android-publisher/).
+To see more technical details on Google subscription, please see [Purchase.subscriptions](https://developers.google.com/android-publisher/api-ref/purchases/subscriptions) from [Goolge Play Developer API](https://developers.google.com/android-publisher/).
 
 ## Testing
 
