@@ -1,0 +1,51 @@
+swagger: '2.0'
+
+info:
+  version: "1.0.0"
+  title: Subscription Validator
+
+host: localhost:8080
+
+schemes:
+  - http
+
+consumes:
+  - application/x-www-form-urlencoded
+
+produces:
+  - application/json
+
+paths:
+  /google/subscription/{token}:
+    get:
+      description: The verify the status of Google subscription of the user.
+      parameters:
+        - name: token
+          in: path
+          description: The token provided to the user's device when the subscription was purchased.
+          required: true
+          type: string
+      tags:
+        - Google
+        - Subscription
+      responses:
+        200:
+          description: Result of the subscription status
+          schema:
+            properties:
+              developerPayload:
+                type: string
+                description: A developer-specified string that contains supplemental information about an order.
+              expiryTimeMillis:
+                type: integer
+                description: Time at which the subscription will expire, in milliseconds since Epoch.
+        default:
+          description: unepected error
+          schema:
+            properties:
+              code:
+                type: integer
+                description: The error code.
+              error:
+                type: string
+                description: The detail of the error.

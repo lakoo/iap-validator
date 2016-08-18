@@ -1,0 +1,8 @@
+# NPM modules
+node_modules
+
+# config.js
+config.js
+
+# editor
+*.sw?

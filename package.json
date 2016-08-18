@@ -1,0 +1,13 @@
+{
+  "name": "purchase_validator",
+  "version": "1.0.0",
+  "description": "Use to validate the Google Play Subsription",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.15.1",
+    "express": "^4.13.4",
+    "google-play-purchase-validator": "^0.0.6"
+  },
+  "devDependencies": {},
+  "author": "Aludirk"
+}
