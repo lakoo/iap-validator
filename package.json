@@ -6,7 +6,8 @@
   "dependencies": {
     "body-parser": "^1.15.1",
     "express": "^4.13.4",
-    "google-play-purchase-validator": "^0.0.6"
+    "google-play-purchase-validator": "^0.0.6",
+    "in-app-purchase": "^1.1.7"
   },
   "devDependencies": {},
   "author": "Aludirk"

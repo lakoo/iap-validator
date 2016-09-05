@@ -8,5 +8,10 @@ config['GOOGLE_API_EMAIL'] = <The email for Google Play service account, see htt
 config['GOOGLE_API_KEY'] = <The private key for Google Play service account, see https://developers.google.com/android-publisher/getting_started#using_a_service_account>;
 config['GOOGLE_PACKAGE_NAME'] = <The package name of the application to verify purchasing>;
 config['GOOGLE_SUBSCRIPTION_ID'] = <The product ID of the subscription>;
-
+config['IOS'] = {
+	<The bundle ID as key>: {
+		verbose: config['DEBUG'],
+		applePassword: <The apple password for subscription from iTunes Connect>
+	},
+};
 module.exports = config;

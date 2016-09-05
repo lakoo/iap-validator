@@ -18,7 +18,7 @@ produces:
 paths:
   /google/subscription/{token}:
     get:
-      description: The verify the status of Google subscription of the user.
+      description: To verify the status of Google subscription of the user.
       parameters:
         - name: token
           in: path
@@ -49,3 +49,75 @@ paths:
               error:
                 type: string
                 description: The detail of the error.
+  /validate/ios/{bundle}/{receipt}:
+    get:
+      description: To verify the status of iOS (IAP/subscription) from the given receipt.
+      parameters:
+        - name: bundle
+          in: path
+          description: The bundle ID of the application.
+          required: true
+          type: string
+        - name: receipt
+          in: path
+          description: The urlencoded base64 encoded string of the Apple receipt.
+          required: true
+          type: string
+      tags:
+        - IAP
+        - iOS
+        - Subscription
+      responses:
+        200:
+          description: Result of the IAP/subscription status
+          schema:
+            properties:
+              code:
+                type: integer
+                description: 0 - constant value, indicate the success of validation.
+              platform:
+                type: string
+                description: iOS - constant string iOS, indicate for iOS platform.
+              type:
+                type: string
+                description: iap - for product type IAP; subscription - for product type Subscription.
+              status:
+                type: integer
+                description: The status code of the receipt.
+              bundle_id:
+                type: string
+                description: The bundle ID of the purchase.
+              product_id:
+                type: string
+                description: The product ID of the purchase.
+              transaction_id:
+                type: string
+                description: The transaction ID of the receipt.
+              original_transaction_id:
+                type: string
+                description: The original transaction ID of the receipt.
+              original_purchase_date:
+                type: string
+                description: The string of date-time for the first purchase.
+              expires_date:
+                type: string
+                description: (subscription only) The Epoch timestamp of epiration.
+              receipt:
+                type: string
+                description: The raw reply of the receipt.
+        default:
+          description: unepected error
+          schema:
+            properties:
+              code:
+                type: integer
+                description: The error code.
+              error:
+                type: string
+                description: The detail of the error.
+              status:
+                type: integer
+                description: The status code of the receipt if have.
+              receipt:
+                type: string
+                description: The receipt JSON from Apple if have.
