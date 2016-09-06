@@ -49,7 +49,7 @@ paths:
               error:
                 type: string
                 description: The detail of the error.
-  /validate/ios/{bundle}/{receipt}:
+  /validate/ios/6/{bundle}/{receipt}:
     get:
       description: To verify the status of iOS (IAP/subscription) from the given receipt.
       parameters:
@@ -84,7 +84,7 @@ paths:
               status:
                 type: integer
                 description: The status code of the receipt.
-              bundle_id:
+              app_id:
                 type: string
                 description: The bundle ID of the purchase.
               product_id:
@@ -97,14 +97,11 @@ paths:
                 type: string
                 description: The original transaction ID of the receipt.
               original_purchase_date:
-                type: string
-                description: The string of date-time for the first purchase.
+                type: integer
+                description: The Epoch timestamp of original purchase date.
               expires_date:
-                type: string
-                description: (subscription only) The Epoch timestamp of epiration.
-              receipt:
-                type: string
-                description: The raw reply of the receipt.
+                type: integer
+                description: (subscription only, otherwise 0) The Epoch timestamp of epiration.
         default:
           description: unepected error
           schema:

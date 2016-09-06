@@ -4,7 +4,7 @@ const config = require('../config.js');
 
 let iap = require('in-app-purchase');
 
-app.get('/validate/ios/:bundle/:receipt', function(req, res) {
+app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 	// Config IAP.
 	if (config['IOS'][req.params.bundle] === 'undefined') {
 		// Invalid configuration.
@@ -16,7 +16,7 @@ app.get('/validate/ios/:bundle/:receipt', function(req, res) {
 		return;
 	}
 	iap.config(config['IOS'][req.params.bundle]);
-                                         
+
 	// Set up response.
 	res.writeHead(200, {'Content-Type': 'application/json'});
 
@@ -57,35 +57,52 @@ app.get('/validate/ios/:bundle/:receipt', function(req, res) {
 			if (iap.isValidated(reply)) {
 				try {
 					// Subscription.
-					if (reply.latest_receipt_info !== 'undefined') {
+					if (reply.hasOwnProperty('latest_receipt_info')) {
+						if (!reply.latest_receipt.hasOwnProperty('bid')
+						||  !reply.latest_receipt.hasOwnProperty('product_id')
+						||  !reply.latest_receipt.hasOwnProperty('transaction_id')
+						||  !reply.latest_receipt.hasOwnProperty('original_transaction_id')
+						||  !reply.latest_receipt.hasOwnProperty('original_purchase_date_ms')
+						||  !reply.latest_receipt.hasOwnProperty('expires_date'))
+						{
+							throw new Error('Fail to parsing Apple receipt.');
+						}
+
 						res.end(JSON.stringify({
 							code: 0,
 							platform: 'iOS',
 							type: 'subscription',
 							status: reply.status,
-							bundle_id: reply.latest_receipt_info.bid,
+							app_id: reply.latest_receipt_info.bid,
 							product_id: reply.latest_receipt_info.product_id,
 							transaction_id: reply.latest_receipt_info.transaction_id,
 							original_transaction_id: reply.latest_receipt_info.original_transaction_id,
-							original_purchase_date: reply.latest_receipt_info.original_purchase_date,
+							original_purchase_date: reply.latest_receipt_info.original_purchase_date_ms,
 							expires_date: reply.latest_receipt_info.expires_date,
-							receipt: JSON.stringify(reply),
 						}));
 					}
 					// IAP.
 					else {
+						if (!reply.receipt.hasOwnProperty('bid')
+						||  !reply.receipt.hasOwnProperty('product_id')
+						||  !reply.receipt.hasOwnProperty('transaction_id')
+						||  !reply.receipt.hasOwnProperty('original_transaction_id')
+						||  !reply.receipt.hasOwnProperty('original_purchase_date_ms'))
+						{
+							throw new Error('Fail to parsing Apple receipt.');
+						}
+
 						res.end(JSON.stringify({
 							code: 0,
 							platform: 'iOS',
 							type: 'iap',
 							status: reply.status,
-							bundle_id: reply.receipt.bid,
+							app_id: reply.receipt.bid,
 							product_id: reply.receipt.product_id,
 							transaction_id: reply.receipt.transaction_id,
 							original_transaction_id: reply.receipt.original_transaction_id,
-							original_purchase_date: reply.receipt.original_purchase_date,
-							expires_date: '',
-							receipt: JSON.stringify(reply),
+							original_purchase_date: reply.receipt.original_purchase_date_ms,
+							expires_date: 0,
 						}));
 					}
 				} catch (err) {

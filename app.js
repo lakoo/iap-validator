@@ -22,7 +22,7 @@ if (config['DEBUG']) {
 }
 
 require('./google/subscription.js');
-require('./ios/validate.js');
+require('./ios/validate6.js');
 
 let server = app.listen(config['PORT'], function() {
 	log('Purchase Validator is running on port: %s', server.address().port);
