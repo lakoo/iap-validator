@@ -1,10 +1,13 @@
-# IAP Validator
+# Purchase Validator
 
 - [Installation](#installation)
 - [Configuration](#configuration)
-- [Run IAP Validator](#run-iap-validator)
+- [Run Purchase Validator](#run-purchase-validator)
 - [Google](#google)
-- [Testing](#testing)
+- [iOS](#ios)
+  - [iOS 6 receipt API](#ios-6-receipt-api)
+  - [iOS 7 receipt API](#ios-7-receipt-api)
+- [Testing/Documentation](#testing-documentation)
 
 ## Installation
 
@@ -18,7 +21,7 @@ npm install
 
 Create a `config.js` file for the configuration of IAP validator, see [config.js.sample](./config.js.sample)
 
-## Run IAP Validator
+## Run Purchase Validator
 
 ```bash
 node app.js
@@ -28,8 +31,32 @@ node app.js
 
 To see more technical details on Google subscription, please see [Purchase.subscriptions](https://developers.google.com/android-publisher/api-ref/purchases/subscriptions) from [Goolge Play Developer API](https://developers.google.com/android-publisher/).
 
-## Testing
+## iOS
 
-Use [swagger editor](http://editor.swagger.io/) to test the RESTful APIs.  To use it, import [swagger.yaml](./swagger.yaml) to the swagger editor.
+To see more technical details on Apple purchase receipt, please see [Validating Receipts With the App Store](https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html).
+
+iOS receipt has few versions in the history, and now we only support the iOS 6 and iOS 7 style receipt.
+
+### iOS 6 receipt API
+
+Use [SKPaymentTransaction:transactionReceipt](https://developer.apple.com/library/ios/documentation/StoreKit/Reference/SKPaymentTransaction_Class/index.html#//apple_ref/occ/instp/SKPaymentTransaction/transactionReceipt) to retrieve the iOS 6 style receipt (deprecated in iOS 7).
+
+API:
+```
+/validate/ios/6/{bundle}/{receipt}
+```
+
+### iOS 7 receipt API
+
+Use [NSBundle:appStoreReceiptURL](https://developer.apple.com/library/ios/documentation/Cocoa/Reference/Foundation/Classes/NSBundle_Class/index.html#//apple_ref/occ/instm/NSBundle/appStoreReceiptURL) to retrieve the iOS 7 style receipt.
+
+API:
+```
+/validate/ios/7/{bundle}/{receipt}/{product_id}
+```
+
+## Testing/Documentation
+
+For the testing and the detail documentation of the RESTful APIs, please use [swagger editor](http://editor.swagger.io/).  To use it, import [swagger.yaml](./swagger.yaml) to the swagger editor.
 
 **When testing the RESTful APIs, please set the port of the server to 8080.**
