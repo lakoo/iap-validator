@@ -51,7 +51,7 @@ paths:
                 description: The detail of the error.
   /validate/ios/6/{bundle}/{receipt}:
     get:
-      description: To verify the status of iOS (IAP/subscription) from the given receipt.
+      description: To verify the status of iOS (IAP/subscription) from the given iOS 6 style receipt.
       parameters:
         - name: bundle
           in: path
@@ -61,6 +61,80 @@ paths:
         - name: receipt
           in: path
           description: The urlencoded base64 encoded string of the Apple receipt.
+          required: true
+          type: string
+      tags:
+        - IAP
+        - iOS
+        - Subscription
+      responses:
+        200:
+          description: Result of the IAP/subscription status
+          schema:
+            properties:
+              code:
+                type: integer
+                description: 0 - constant value, indicate the success of validation.
+              platform:
+                type: string
+                description: iOS - constant string iOS, indicate for iOS platform.
+              type:
+                type: string
+                description: iap - for product type IAP; subscription - for product type Subscription.
+              status:
+                type: integer
+                description: The status code of the receipt.
+              app_id:
+                type: string
+                description: The bundle ID of the purchase.
+              product_id:
+                type: string
+                description: The product ID of the purchase.
+              transaction_id:
+                type: string
+                description: The transaction ID of the receipt.
+              original_transaction_id:
+                type: string
+                description: The original transaction ID of the receipt.
+              original_purchase_date:
+                type: integer
+                description: The Epoch timestamp of original purchase date.
+              expires_date:
+                type: integer
+                description: (subscription only, otherwise 0) The Epoch timestamp of epiration.
+        default:
+          description: unepected error
+          schema:
+            properties:
+              code:
+                type: integer
+                description: The error code.
+              error:
+                type: string
+                description: The detail of the error.
+              status:
+                type: integer
+                description: The status code of the receipt if have.
+              receipt:
+                type: string
+                description: The receipt JSON from Apple if have.
+  /validate/ios/7/{bundle}/{receipt}/{product_id}:
+    get:
+      description: To verify the status of iOS (IAP/subscription) from the given iOS 7 style receipt.
+      parameters:
+        - name: bundle
+          in: path
+          description: The bundle ID of the application.
+          required: true
+          type: string
+        - name: receipt
+          in: path
+          description: The urlencoded base64 encoded string of the Apple receipt.
+          required: true
+          type: string
+        - name: product_id
+          in: path
+          description: The product ID to validate.
           required: true
           type: string
       tags:

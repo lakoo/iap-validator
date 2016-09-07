@@ -4,7 +4,7 @@ const config = require('../config.js');
 
 let iap = require('in-app-purchase');
 
-app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
+app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 	// Config IAP.
 	if (config['IOS'][req.params.bundle] === 'undefined') {
 		// Invalid configuration.
@@ -56,55 +56,59 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 
 			if (iap.isValidated(reply)) {
 				try {
-					// Subscription.
-					if (reply.hasOwnProperty('latest_receipt_info')) {
-						if (!reply.latest_receipt.hasOwnProperty('bid')
-						||  !reply.latest_receipt.hasOwnProperty('product_id')
-						||  !reply.latest_receipt.hasOwnProperty('transaction_id')
-						||  !reply.latest_receipt.hasOwnProperty('original_transaction_id')
-						||  !reply.latest_receipt.hasOwnProperty('original_purchase_date_ms')
-						||  !reply.latest_receipt.hasOwnProperty('expires_date'))
+					// Purchase.
+					if (!reply.hasOwnProperty('receipt')
+					||  !reply.receipt.hasOwnProperty('request_date_ms')
+					||  !reply.receipt.hasOwnProperty('bundle_id')
+					||  !reply.receipt.hasOwnProperty('in_app'))
+					{
+						throw new Error('Fail to parsing Apple receipt.');
+					}
+
+					let finalReceipt = null;
+					let expiryTime = 0;
+					reply.receipt.in_app.forEach(function(receipt) {
+						if (!receipt.hasOwnProperty('product_id')
+						||  !receipt.hasOwnProperty('transaction_id')
+						||  !receipt.hasOwnProperty('original_transaction_id')
+						||  !receipt.hasOwnProperty('original_purchase_date_ms'))
 						{
 							throw new Error('Fail to parsing Apple receipt.');
 						}
 
-						res.end(JSON.stringify({
-							code: 0,
-							platform: 'iOS',
-							type: 'subscription',
-							status: reply.status,
-							app_id: reply.latest_receipt_info.bid,
-							product_id: reply.latest_receipt_info.product_id,
-							transaction_id: reply.latest_receipt_info.transaction_id,
-							original_transaction_id: reply.latest_receipt_info.original_transaction_id,
-							original_purchase_date: parseInt(reply.latest_receipt_info.original_purchase_date_ms),
-							expires_date: parseInt(reply.latest_receipt_info.expires_date),
-						}));
-					}
-					// IAP.
-					else {
-						if (!reply.receipt.hasOwnProperty('bid')
-						||  !reply.receipt.hasOwnProperty('product_id')
-						||  !reply.receipt.hasOwnProperty('transaction_id')
-						||  !reply.receipt.hasOwnProperty('original_transaction_id')
-						||  !reply.receipt.hasOwnProperty('original_purchase_date_ms'))
-						{
-							throw new Error('Fail to parsing Apple receipt.');
+						if (receipt.product_id != req.params.product_id) {
+							return true;
 						}
 
-						res.end(JSON.stringify({
-							code: 0,
-							platform: 'iOS',
-							type: 'iap',
-							status: reply.status,
-							app_id: reply.receipt.bid,
-							product_id: reply.receipt.product_id,
-							transaction_id: reply.receipt.transaction_id,
-							original_transaction_id: reply.receipt.original_transaction_id,
-							original_purchase_date: parseInt(reply.receipt.original_purchase_date_ms),
-							expires_date: 0,
-						}));
-					}
+						// Subsription
+						if (receipt.hasOwnProperty('expires_date_ms')) {
+							let time = parseInt(receipt.expires_date_ms);
+							if (time > expiryTime) {
+								finalReceipt = receipt;
+								expiryTime = time;
+							}
+							return true;
+						}
+						// IAP
+						else {
+							finalReceipt = receipt;
+							expiryTime = 0;
+							return false;
+						}
+					});
+
+					res.end(JSON.stringify({
+						code: 0,
+						platform: 'iOS',
+						type: ((expiryTime > 0) ? 'subscription' : 'iap'),
+						status: reply.status,
+						app_id: reply.receipt.bundle_id,
+						product_id: finalReceipt.product_id,
+						transaction_id: finalReceipt.transaction_id,
+						original_transaction_id: finalReceipt.original_transaction_id,
+						original_purchase_date: parseInt(finalReceipt.original_purchase_date_ms),
+						expires_date: expiryTime,
+					}));
 				} catch (err) {
 					log('iOS parsing receipt failed: ' + JSON.stringify(reply));
 					res.end(JSON.stringify({
