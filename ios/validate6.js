@@ -58,12 +58,12 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 				try {
 					// Subscription.
 					if (reply.hasOwnProperty('latest_receipt_info')) {
-						if (!reply.latest_receipt.hasOwnProperty('bid')
-						||  !reply.latest_receipt.hasOwnProperty('product_id')
-						||  !reply.latest_receipt.hasOwnProperty('transaction_id')
-						||  !reply.latest_receipt.hasOwnProperty('original_transaction_id')
-						||  !reply.latest_receipt.hasOwnProperty('original_purchase_date_ms')
-						||  !reply.latest_receipt.hasOwnProperty('expires_date'))
+						if (!reply.latest_receipt_info.hasOwnProperty('bid')
+						||  !reply.latest_receipt_info.hasOwnProperty('product_id')
+						||  !reply.latest_receipt_info.hasOwnProperty('transaction_id')
+						||  !reply.latest_receipt_info.hasOwnProperty('original_transaction_id')
+						||  !reply.latest_receipt_info.hasOwnProperty('original_purchase_date_ms')
+						||  !reply.latest_receipt_info.hasOwnProperty('expires_date'))
 						{
 							throw new Error('Fail to parsing Apple receipt.');
 						}
