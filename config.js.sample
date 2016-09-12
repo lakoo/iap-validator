@@ -4,10 +4,14 @@ let config = {};
 
 config['DEBUG'] = false;
 config['PORT'] = 8080;
-config['GOOGLE_API_EMAIL'] = <The email for Google Play service account, see https://developers.google.com/android-publisher/getting_started#using_a_service_account>;
-config['GOOGLE_API_KEY'] = <The private key for Google Play service account, see https://developers.google.com/android-publisher/getting_started#using_a_service_account>;
-config['GOOGLE_PACKAGE_NAME'] = <The package name of the application to verify purchasing>;
-config['GOOGLE_SUBSCRIPTION_ID'] = <The product ID of the subscription>;
+
+config['GOOGLE'] = {
+	<The package name as key>: {
+		'EMAIL': <The email for Google Play service account, see https://developers.google.com/android-publisher/getting_started#using_a_service_account>,
+		'KEY': <The private key for Google Play service account, see https://developers.google.com/android-publisher/getting_started#using_a_service_account>,
+	}
+};
+
 config['IOS'] = {
 	<The bundle ID as key>: {
 		verbose: config['DEBUG'],

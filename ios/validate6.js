@@ -72,11 +72,18 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 							code: 0,
 							platform: 'iOS',
 							type: 'subscription',
-							status: reply.status,
 							app_id: reply.latest_receipt_info.bid,
 							product_id: reply.latest_receipt_info.product_id,
+							status: reply.status,
 							transaction_id: reply.latest_receipt_info.transaction_id,
 							original_transaction_id: reply.latest_receipt_info.original_transaction_id,
+							purchase_state: 0,
+							consumption_state: 0,
+							auto_renewing: false,
+							price_currency_code: '',
+							price_amount_micros: 0,
+							country_code: '',
+							cancel_reason: 0,
 							original_purchase_date: parseInt(reply.latest_receipt_info.original_purchase_date_ms),
 							expires_date: parseInt(reply.latest_receipt_info.expires_date),
 						}));
@@ -96,11 +103,18 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 							code: 0,
 							platform: 'iOS',
 							type: 'iap',
-							status: reply.status,
 							app_id: reply.receipt.bid,
 							product_id: reply.receipt.product_id,
+							status: reply.status,
 							transaction_id: reply.receipt.transaction_id,
 							original_transaction_id: reply.receipt.original_transaction_id,
+							purchase_state: 0,
+							consumption_state: 0,
+							auto_renewing: false,
+							price_currency_code: '',
+							price_amount_micros: 0,
+							country_code: '',
+							cancel_reason: 0,
 							original_purchase_date: parseInt(reply.receipt.original_purchase_date_ms),
 							expires_date: 0,
 						}));
@@ -109,7 +123,8 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 					log('iOS parsing receipt failed: ' + JSON.stringify(reply));
 					res.end(JSON.stringify({
 						code: 103,
-						error: 'Parsing receipt failed: ' + JSON.stringify(reply),
+						receipt: JSON.stringify(reply),
+						error: 'Parsing receipt failed.',
 					}));
 				}
 				return;
@@ -120,7 +135,7 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 					code: 104,
 					status: reply.status,
 					receipt: JSON.stringify(reply),
-					error: 'Validation failed: ' + JSON.stringify(reply),
+					error: 'Validation failed.',
 				}));
 				return;
 			}

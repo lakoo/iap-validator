@@ -4,6 +4,7 @@
 - [Configuration](#configuration)
 - [Run Purchase Validator](#run-purchase-validator)
 - [Google](#google)
+  - [Google API](#google-api)
 - [iOS](#ios)
   - [iOS 6 receipt API](#ios-6-receipt-api)
   - [iOS 7 receipt API](#ios-7-receipt-api)
@@ -29,7 +30,14 @@ node app.js
 
 ## Google
 
-To see more technical details on Google subscription, please see [Purchase.subscriptions](https://developers.google.com/android-publisher/api-ref/purchases/subscriptions) from [Goolge Play Developer API](https://developers.google.com/android-publisher/).
+To see more technical details on Google purchase, please see [Purchase.Products](https://developers.google.com/android-publisher/api-ref/purchases/products) and [Purchase.subscriptions](https://developers.google.com/android-publisher/api-ref/purchases/subscriptions) from [Goolge Play Developer API](https://developers.google.com/android-publisher/).
+
+### Google API
+
+API:
+```
+/validate/google/{purchase_data}
+```
 
 ## iOS
 

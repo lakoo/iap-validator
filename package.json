@@ -1,12 +1,12 @@
 {
-  "name": "purchase_validator",
-  "version": "1.0.0",
-  "description": "Use to validate the Google Play Subsription",
+  "name": "purchase-validator",
+  "version": "1.2.0",
+  "description": "Use to validate the purchase (IAP and subscription) from Apple Store and Google Play Store",
   "main": "app.js",
   "dependencies": {
     "body-parser": "^1.15.1",
     "express": "^4.13.4",
-    "google-play-purchase-validator": "^0.0.6",
+	"google-oauth-jwt": "^0.1.6",
     "in-app-purchase": "^1.1.7"
   },
   "devDependencies": {},

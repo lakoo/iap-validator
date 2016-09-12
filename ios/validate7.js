@@ -58,7 +58,6 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 				try {
 					// Purchase.
 					if (!reply.hasOwnProperty('receipt')
-					||  !reply.receipt.hasOwnProperty('request_date_ms')
 					||  !reply.receipt.hasOwnProperty('bundle_id')
 					||  !reply.receipt.hasOwnProperty('in_app'))
 					{
@@ -101,11 +100,18 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 						code: 0,
 						platform: 'iOS',
 						type: ((expiryTime > 0) ? 'subscription' : 'iap'),
-						status: reply.status,
 						app_id: reply.receipt.bundle_id,
 						product_id: finalReceipt.product_id,
+						status: reply.status,
 						transaction_id: finalReceipt.transaction_id,
 						original_transaction_id: finalReceipt.original_transaction_id,
+						purchase_state: 0,
+						consumption_state: 0,
+						auto_renewing: false,
+						price_currency_code: '',
+						price_amount_micros: 0,
+						country_code: '',
+						cancel_reason: 0,
 						original_purchase_date: parseInt(finalReceipt.original_purchase_date_ms),
 						expires_date: expiryTime,
 					}));
@@ -113,7 +119,8 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 					log('iOS parsing receipt failed: ' + JSON.stringify(reply));
 					res.end(JSON.stringify({
 						code: 103,
-						error: 'Parsing receipt failed: ' + JSON.stringify(reply),
+						receipt: JSON.stringify(reply),
+						error: 'Parsing receipt failed.',
 					}));
 				}
 				return;
@@ -124,7 +131,7 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 					code: 104,
 					status: reply.status,
 					receipt: JSON.stringify(reply),
-					error: 'Validation failed: ' + JSON.stringify(reply),
+					error: 'Validation failed.',
 				}));
 				return;
 			}

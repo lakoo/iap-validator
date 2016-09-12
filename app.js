@@ -21,7 +21,7 @@ if (config['DEBUG']) {
 	});
 }
 
-require('./google/subscription.js');
+require('./google/validate.js');
 require('./ios/validate6.js');
 require('./ios/validate7.js');
 
