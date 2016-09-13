@@ -63,10 +63,10 @@ paths:
                 description: A developer-specified string that contains supplemental information about an order.
               purchase_state:
                 type: integer
-                description: (iap only) The purchase state of the order. Possible values are - (0:Purchased, 1:Cancelled).
+                description: (iap only) The purchase state of the order. Possible values are - (-1:No such state, 0:Purchased, 1:Cancelled).
               consumption_state:
                 type: integer
-                description: (iap only) The consumption state of the inapp product. Possible values are - (0:Yet to be consumed, 1:Consumed).
+                description: (iap only) The consumption state of the inapp product. Possible values are - (-1:No such state, 0:Yet to be consumed, 1:Consumed).
               auto_renewing:
                 type: boolean
                 description: (subscription only) Whether the subscription will automatically be renewed when it reaches its current expiry time.
@@ -79,9 +79,12 @@ paths:
               country_code:
                 type: string
                 description: (subscription only) ISO 3166-1 alpha-2 billing country/region code of the user at the time the subscription was granted.
+              payment_state:
+                type: integer
+                description: The payment state of the subscription. Possible values are - (-1:No such state, 0:Payment pending, 1:Payment received).
               cancel_reason:
                 type: integer
-                description: (subscription only) The cancel reason of the subscription, if the subscription is not auto renewing. Possible values are - (0:User cancelled the subscription, 1:Subscription was cancelled by the system, for example because of a billing problem).
+                description: (subscription only) The cancel reason of the subscription, if the subscription is not auto renewing. Possible values are - (-1:No such state, 0:User cancelled the subscription, 1:Subscription was cancelled by the system, for example because of a billing problem).
               original_purchase_date:
                 type: integer
                 description: The Epoch timestamp in milliseconds of original purchase date.
@@ -168,6 +171,9 @@ paths:
                 description: (reserved)
               country_code:
                 type: string
+                description: (reserved)
+              payment_state:
+                type: integer
                 description: (reserved)
               cancel_reason:
                 type: integer
@@ -266,6 +272,9 @@ paths:
                 description: (reserved)
               country_code:
                 type: string
+                description: (reserved)
+              payment_state:
+                type: integer
                 description: (reserved)
               cancel_reason:
                 type: integer

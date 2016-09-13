@@ -111,6 +111,7 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 						price_currency_code: '',
 						price_amount_micros: 0,
 						country_code: '',
+						payment_state: 0,
 						cancel_reason: 0,
 						original_purchase_date: parseInt(finalReceipt.original_purchase_date_ms),
 						expires_date: expiryTime,

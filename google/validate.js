@@ -89,11 +89,18 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 
 				// IAP
 				if (type == 'iap') {
-					if (!bodyObj.hasOwnProperty('purchaseTimeMillis')
-					||  !bodyObj.hasOwnProperty('purchaseState')
-					||  !bodyObj.hasOwnProperty('consumptionState'))
+					if (!bodyObj.hasOwnProperty('purchaseTimeMillis'))
 					{
 						throw new Error('Fail to parsing Google receipt.');
+					}
+
+					let purchaseState = -1;
+					if (bodyObj.hasOwnProperty('purchaseState')) {
+						purchaseState = parseInt(bodyObj.purchaseState);
+					}
+					let consumptionState = -1;
+					if (bodyObj.hasOwnProperty('consumptionState')) {
+						consumptionState = parseInt(bodyObj.consumptionState);
 					}
 
 					res.end(JSON.stringify({
@@ -106,13 +113,14 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 						transaction_id: '',
 						original_transaction_id: '',
 						developer_payload: bodyObj.developerPayload,
-						purchase_state: parseInt(bodyObj.purchaseState),
-						consumption_state: parseInt(bodyObj.consumptionState),
+						purchase_state: purchaseState,
+						consumption_state: consumptionState,
 						auto_renewing: false,
 						price_currency_code: '',
 						price_amount_micros: 0,
 						country_code: '',
-						cancel_reason: 0,
+						payment_state: -1,
+						cancel_reason: -1,
 						original_purchase_date: parseInt(bodyObj.purchaseTimeMillis),
 						expires_date: 0,
 					}));
@@ -124,10 +132,18 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 					||  !bodyObj.hasOwnProperty('autoRenewing')
 					||  !bodyObj.hasOwnProperty('priceCurrencyCode')
 					||  !bodyObj.hasOwnProperty('priceAmountMicros')
-					||  !bodyObj.hasOwnProperty('countryCode')
-					||  !bodyObj.hasOwnProperty('cancelReason'))
+					||  !bodyObj.hasOwnProperty('countryCode'))
 					{
 						throw new Error('Fail to parsing Google receipt.');
+					}
+
+					let paymentState = -1;
+					if (bodyObj.hasOwnProperty('paymentState')) {
+						paymentState = parseInt(bodyObj.paymentState);
+					}
+					let cancelReason = -1;
+					if (bodyObj.hasOwnProperty('cancelReason')) {
+						cancelReason = parseInt(bodyObj.cancelReason);
 					}
 
 					res.end(JSON.stringify({
@@ -140,13 +156,14 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 						transaction_id: '',
 						original_transaction_id: '',
 						developer_payload: bodyObj.developerPayload,
-						purchase_state: 0,
-						consumption_state: 0,
+						purchase_state: -1,
+						consumption_state: -1,
 						auto_renewing: !!JSON.parse(bodyObj.autoRenewing),
 						price_currency_code: bodyObj.priceCurrencyCode,
 						price_amount_micros: parseInt(bodyObj.priceAmountMicros),
 						country_code: bodyObj.countryCode,
-						cancel_reason: parseInt(bodyObj.cancelReason),
+						payment_state: paymentState,
+						cancel_reason: cancelReason,
 						original_purchase_date: parseInt(bodyObj.startTimeMillis),
 						expires_date: parseInt(bodyObj.expiryTimeMillis),
 					}));
