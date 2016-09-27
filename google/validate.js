@@ -2,8 +2,11 @@
 
 const config = require('../config.js');
 
-let google = require('google-oauth-jwt');
+let os = require("os");
 let util = require('util');
+let request = require('request');
+let googleRequest = require('google-oauth-jwt').requestWithJWT(request);
+let Slack = require('node-slack');
 
 app.get('/validate/google/:purchase_data', function(req, res) {
 	// Set up response.
@@ -38,6 +41,25 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 	}
 	let configData = config['GOOGLE'][purchaseData.packageName];
 
+	let timeoutTimer = setTimeout(function(){
+		log('Google request timeout ' + req.params.purchase_data);
+
+		if (configData['SLACK_URL']) {
+			var slack = new Slack(configData['SLACK_URL']);
+			slack.send({
+	    		username: os.hostname() ,
+	    		text: "iap-validator ERROR",
+	            attachments: [{"title": "REQUEST TIMEOUT", "color": "danger", "text": "platform: Google, payload: " + req.params.purchase_data}]
+			});
+		}
+
+		res.end(JSON.stringify({
+			code: 110,
+			error: 'Request timeout: ' + req.params.purchase_data,
+		}));
+		return;
+	}, config['TIMEOUT']);
+
 	// Compute the API.
 	let type = '';
 	let api = 'https://www.googleapis.com/androidpublisher/v2/applications/%%s/purchases/%s/%%s/tokens/%s';
@@ -55,15 +77,18 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 			encodeURIComponent(purchaseData.purchaseToken));
 
 	// Verify the receipt.
-	google.requestWithJWT()({
+	googleRequest({
 		url: api,
 		jwt: {
 			email: configData['EMAIL'],
 			key: configData['KEY'],
 			keyFile: undefined,
 			scopes: ['https://www.googleapis.com/auth/androidpublisher']
-		}},
+		},
+		timeout: 5000,
+		},
 		function(err, reply, body) {
+			clearTimeout(timeoutTimer);
 			if (err) {
 				log('Google verification failed: ' + err.toString());
 				res.end(JSON.stringify({
