@@ -59,14 +59,14 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 					// Purchase.
 					if (!reply.hasOwnProperty('receipt')
 					||  !reply.receipt.hasOwnProperty('bundle_id')
-					||  !reply.receipt.hasOwnProperty('in_app'))
+					||  !reply.hasOwnProperty('latest_receipt_info'))
 					{
 						throw new Error('Fail to parsing Apple receipt.');
 					}
 
 					let finalReceipt = null;
 					let expiryTime = 0;
-					reply.receipt.in_app.forEach(function(receipt) {
+					reply.latest_receipt_info.forEach(function(receipt) {
 						if (!receipt.hasOwnProperty('product_id')
 						||  !receipt.hasOwnProperty('transaction_id')
 						||  !receipt.hasOwnProperty('original_transaction_id')
