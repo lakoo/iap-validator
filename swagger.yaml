@@ -85,6 +85,9 @@ paths:
               cancel_reason:
                 type: integer
                 description: (subscription only) The cancel reason of the subscription, if the subscription is not auto renewing. Possible values are - (-1:No such state, 0:User cancelled the subscription, 1:Subscription was cancelled by the system, for example because of a billing problem).
+              is_trial_period:
+                type: boolean
+                description: (reserved)
               original_purchase_date:
                 type: integer
                 description: The Epoch timestamp in milliseconds of original purchase date.
@@ -177,6 +180,9 @@ paths:
                 description: (reserved)
               cancel_reason:
                 type: integer
+                description: (reserved)
+              is_trial_period:
+                type: boolean
                 description: (reserved)
               original_purchase_date:
                 type: integer
@@ -279,6 +285,9 @@ paths:
               cancel_reason:
                 type: integer
                 description: (reserved)
+              is_trial_period:
+                type: boolean
+                description: for subscription only, whether it is in trial period.
               original_purchase_date:
                 type: integer
                 description: The Epoch timestamp in milliseconds of original purchase date.

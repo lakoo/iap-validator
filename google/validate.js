@@ -47,9 +47,9 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 		if (configData['SLACK_URL']) {
 			var slack = new Slack(configData['SLACK_URL']);
 			slack.send({
-	    		username: os.hostname() ,
-	    		text: "iap-validator ERROR",
-	            attachments: [{"title": "REQUEST TIMEOUT", "color": "danger", "text": "platform: Google, payload: " + req.params.purchase_data}]
+				username: os.hostname(),
+				text: "iap-validator ERROR",
+				attachments: [{"title": "REQUEST TIMEOUT", "color": "danger", "text": "platform: Google, payload: " + req.params.purchase_data}]
 			});
 		}
 
@@ -146,6 +146,7 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 						country_code: '',
 						payment_state: -1,
 						cancel_reason: -1,
+						is_trial_period: false,
 						original_purchase_date: parseInt(bodyObj.purchaseTimeMillis),
 						expires_date: 0,
 					}));
