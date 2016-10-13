@@ -85,6 +85,7 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 							country_code: '',
 							payment_state: 0,
 							cancel_reason: 0,
+							is_trial_period: false,
 							original_purchase_date: parseInt(reply.latest_receipt_info.original_purchase_date_ms),
 							expires_date: parseInt(reply.latest_receipt_info.expires_date),
 						}));
@@ -117,6 +118,7 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 							country_code: '',
 							payment_state: 0,
 							cancel_reason: 0,
+							is_trial_period: false,
 							original_purchase_date: parseInt(reply.receipt.original_purchase_date_ms),
 							expires_date: 0,
 						}));

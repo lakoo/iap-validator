@@ -96,6 +96,11 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 						}
 					});
 
+					let isTrialPeriod = false;
+					if (finalReceipt.hasOwnProperty('is_trial_period')) {
+						isTrialPeriod = !!JSON.parse(finalReceipt.is_trial_period);
+					}
+
 					res.end(JSON.stringify({
 						code: 0,
 						platform: 'iOS',
@@ -113,6 +118,7 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 						country_code: '',
 						payment_state: 0,
 						cancel_reason: 0,
+						is_trial_period: isTrialPeriod,
 						original_purchase_date: parseInt(finalReceipt.original_purchase_date_ms),
 						expires_date: expiryTime,
 					}));
