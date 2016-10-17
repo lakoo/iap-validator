@@ -153,6 +153,10 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 						original_purchase_date: parseInt(finalReceipt.original_purchase_date_ms),
 						expires_date: ((type === 'subscription') ? latestTime : 0),
 					}));
+
+					if (config['DEBUG']) {
+						log('iOS7 success receipt log: ' + JSON.stringify(reply));
+					}
 				} catch (err) {
 					log('iOS parsing receipt failed: ' + JSON.stringify(reply));
 					res.end(JSON.stringify({
