@@ -4,6 +4,49 @@ const config = require('../config.js');
 
 let iap = require('in-app-purchase');
 
+function findLatestReceipt(productID, receipts){
+	let finalReceipt = null;
+	let latestTime = 0;
+	let type = '';
+
+	receipts.forEach(function(receipt) {
+		if (!receipt.hasOwnProperty('product_id')
+		||  !receipt.hasOwnProperty('transaction_id')
+		||  !receipt.hasOwnProperty('original_transaction_id')
+		||  !receipt.hasOwnProperty('original_purchase_date_ms'))
+		{
+			throw new Error('Fail to parsing Apple receipt.');
+		}
+
+		if (receipt.product_id != productID) {
+			return true;
+		}
+
+		// Subsription
+		if (receipt.hasOwnProperty('expires_date_ms')) {
+			let time = parseInt(receipt.expires_date_ms);
+			if (time > latestTime) {
+				finalReceipt = receipt;
+				latestTime = time;
+			}
+			type = 'subscription';
+		}
+		// IAP
+		else if (receipt.hasOwnProperty('purchase_date_ms')) {
+			let time = parseInt(receipt.purchase_date_ms);
+			if (time > latestTime) {
+				finalReceipt = receipt;
+				latestTime = time;
+			}
+			type = 'iap';
+		}
+
+		return true;
+	});
+
+	return {'receipt':finalReceipt, 'latest_ms':latestTime, 'type':type};
+}
+
 app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 	// Config IAP.
 	if (config['IOS'][req.params.bundle] === 'undefined') {
@@ -59,42 +102,30 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 					// Purchase.
 					if (!reply.hasOwnProperty('receipt')
 					||  !reply.receipt.hasOwnProperty('bundle_id')
-					||  !reply.hasOwnProperty('latest_receipt_info'))
+					||  !reply.receipt.hasOwnProperty('in_app'))
 					{
 						throw new Error('Fail to parsing Apple receipt.');
 					}
 
 					let finalReceipt = null;
-					let expiryTime = 0;
-					reply.latest_receipt_info.forEach(function(receipt) {
-						if (!receipt.hasOwnProperty('product_id')
-						||  !receipt.hasOwnProperty('transaction_id')
-						||  !receipt.hasOwnProperty('original_transaction_id')
-						||  !receipt.hasOwnProperty('original_purchase_date_ms'))
-						{
-							throw new Error('Fail to parsing Apple receipt.');
-						}
+					let latestTime = 0;
+					let type = '';
 
-						if (receipt.product_id != req.params.product_id) {
-							return true;
-						}
+					// Handle 'latest_receipt_info', deprecated field
+					if (reply.hasOwnProperty('latest_receipt_info')) {
+						let output = findLatestReceipt(req.params.product_id, reply.latest_receipt_info);
+						finalReceipt = output.receipt;
+						latestTime = output.latest_ms;
+						type = output.type;
+					}
 
-						// Subsription
-						if (receipt.hasOwnProperty('expires_date_ms')) {
-							let time = parseInt(receipt.expires_date_ms);
-							if (time > expiryTime) {
-								finalReceipt = receipt;
-								expiryTime = time;
-							}
-							return true;
-						}
-						// IAP
-						else {
-							finalReceipt = receipt;
-							expiryTime = 0;
-							return false;
-						}
-					});
+					// Handle 'in_app'
+					let output = findLatestReceipt(req.params.product_id, reply.receipt.in_app);
+					if (output.latest_ms > latestTime) {
+						finalReceipt = output.receipt;
+						latestTime = output.latest_ms;
+						type = output.type;
+					}
 
 					let isTrialPeriod = false;
 					if (finalReceipt.hasOwnProperty('is_trial_period')) {
@@ -104,7 +135,7 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 					res.end(JSON.stringify({
 						code: 0,
 						platform: 'iOS',
-						type: ((expiryTime > 0) ? 'subscription' : 'iap'),
+						type: type,
 						app_id: reply.receipt.bundle_id,
 						product_id: finalReceipt.product_id,
 						status: reply.status,
@@ -120,14 +151,14 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 						cancel_reason: 0,
 						is_trial_period: isTrialPeriod,
 						original_purchase_date: parseInt(finalReceipt.original_purchase_date_ms),
-						expires_date: expiryTime,
+						expires_date: ((type === 'subscription') ? latestTime : 0),
 					}));
 				} catch (err) {
 					log('iOS parsing receipt failed: ' + JSON.stringify(reply));
 					res.end(JSON.stringify({
 						code: 103,
 						receipt: JSON.stringify(reply),
-						error: 'Parsing receipt failed.',
+						error: 'Parsing receipt failed (' + err.toString() + ').',
 					}));
 				}
 				return;
