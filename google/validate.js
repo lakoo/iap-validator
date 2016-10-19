@@ -4,8 +4,7 @@ const config = require('../config.js');
 
 let os = require("os");
 let util = require('util');
-let request = require('request');
-let googleRequest = require('google-oauth-jwt').requestWithJWT(request);
+let google = require('googleapis');
 let Slack = require('node-slack');
 
 app.get('/validate/google/:purchase_data', function(req, res) {
@@ -60,148 +59,140 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 		return;
 	}, config['TIMEOUT']);
 
-	// Compute the API.
-	let type = '';
-	let api = 'https://www.googleapis.com/androidpublisher/v2/applications/%%s/purchases/%s/%%s/tokens/%s';
-	if (purchaseData.hasOwnProperty('autoRenewing')) {
-		type = 'subscription';
-		api = util.format(api, 'subscriptions');
-	} else {
-		type = 'iap';
-		api = util.format(api, 'products');
-	}
-	api = util.format(
-			api,
-			encodeURIComponent(purchaseData.packageName),
-			encodeURIComponent(purchaseData.productId),
-			encodeURIComponent(purchaseData.purchaseToken));
+	const jwtClient = new google.auth.JWT(configData['EMAIL'], null, configData['KEY'], ['https://www.googleapis.com/auth/androidpublisher'], null);
+	jwtClient.authorize(function(err, tokens) {
+		if (err) {
+			log('Google verification failed: ' + err.toString());
+			res.end(JSON.stringify({
+				code: 101,
+				receipt: req.params.purchase_data,
+				error: 'Verification failed: ' + err.toString(),
+			}));
+		}
 
-	// Verify the receipt.
-	googleRequest({
-		url: api,
-		jwt: {
-			email: configData['EMAIL'],
-			key: configData['KEY'],
-			keyFile: undefined,
-			scopes: ['https://www.googleapis.com/auth/androidpublisher']
-		},
-		timeout: 5000,
-		},
-		function(err, reply, body) {
+		let requestGoogleAPI = null;
+		let type = ''
+		if (purchaseData.hasOwnProperty('autoRenewing')) {
+			requestGoogleAPI = google.androidpublisher('v2').purchases.subscriptions.get;
+			type = 'subscription';
+		} else {
+			requestGoogleAPI = google.androidpublisher('v2').purchases.products.get;
+			type = 'iap';
+		}
+
+		const params = {
+							auth: jwtClient,
+							packageName: purchaseData.packageName,
+							productId: purchaseData.productId,
+							subscriptionId: purchaseData.productId,
+							token: purchaseData.purchaseToken,
+					   }
+
+		requestGoogleAPI( params, function (err, bodyObj) {
 			clearTimeout(timeoutTimer);
 			if (err) {
 				log('Google verification failed: ' + err.toString());
 				res.end(JSON.stringify({
 					code: 101,
-					receipt: body,
+					receipt: req.params.purchase_data,
 					error: 'Verification failed: ' + err.toString(),
 				}));
 			}
+			if (!bodyObj.hasOwnProperty('kind')
+			||  !bodyObj.hasOwnProperty('developerPayload'))
+			{
+				throw new Error('Fail to parsing Google receipt.');
+			}
 
-			try {
-				let bodyObj = JSON.parse(body);
-				if (!bodyObj.hasOwnProperty('kind')
-				||  !bodyObj.hasOwnProperty('developerPayload'))
+			if (((type == 'iap') && (bodyObj.kind == 'androidpublisher#subscriptionPurchase'))
+			||  ((type == 'subscription') && (bodyObj.kind == 'androidpublisher#productPurchase')))
+			{
+				throw new Error('Fail to parsing Google receipt.');
+			}
+
+			// IAP
+			if (type == 'iap') {
+				if (!bodyObj.hasOwnProperty('purchaseTimeMillis'))
 				{
 					throw new Error('Fail to parsing Google receipt.');
 				}
 
-				if (((type == 'iap') && (bodyObj.kind == 'androidpublisher#subscriptionPurchase'))
-				||  ((type == 'subscription') && (bodyObj.kind == 'androidpublisher#productPurchase')))
-				{
-					throw new Error('Fail to parsing Google receipt.');
+				let purchaseState = -1;
+				if (bodyObj.hasOwnProperty('purchaseState')) {
+					purchaseState = parseInt(bodyObj.purchaseState);
+				}
+				let consumptionState = -1;
+				if (bodyObj.hasOwnProperty('consumptionState')) {
+					consumptionState = parseInt(bodyObj.consumptionState);
 				}
 
-				// IAP
-				if (type == 'iap') {
-					if (!bodyObj.hasOwnProperty('purchaseTimeMillis'))
-					{
-						throw new Error('Fail to parsing Google receipt.');
-					}
-
-					let purchaseState = -1;
-					if (bodyObj.hasOwnProperty('purchaseState')) {
-						purchaseState = parseInt(bodyObj.purchaseState);
-					}
-					let consumptionState = -1;
-					if (bodyObj.hasOwnProperty('consumptionState')) {
-						consumptionState = parseInt(bodyObj.consumptionState);
-					}
-
-					res.end(JSON.stringify({
-						code: 0,
-						plaatform: 'Google',
-						type: 'iap',
-						app_id: purchaseData.packageName,
-						product_id: purchaseData.productId,
-						status: 0,
-						transaction_id: '',
-						original_transaction_id: '',
-						developer_payload: bodyObj.developerPayload,
-						purchase_state: purchaseState,
-						consumption_state: consumptionState,
-						auto_renewing: false,
-						price_currency_code: '',
-						price_amount_micros: 0,
-						country_code: '',
-						payment_state: -1,
-						cancel_reason: -1,
-						is_trial_period: false,
-						original_purchase_date: parseInt(bodyObj.purchaseTimeMillis),
-						expires_date: 0,
-					}));
-				}
-				// Subscription
-				else if (type == 'subscription') {
-					if (!bodyObj.hasOwnProperty('startTimeMillis')
-					||  !bodyObj.hasOwnProperty('expiryTimeMillis')
-					||  !bodyObj.hasOwnProperty('autoRenewing')
-					||  !bodyObj.hasOwnProperty('priceCurrencyCode')
-					||  !bodyObj.hasOwnProperty('priceAmountMicros')
-					||  !bodyObj.hasOwnProperty('countryCode'))
-					{
-						throw new Error('Fail to parsing Google receipt.');
-					}
-
-					let paymentState = -1;
-					if (bodyObj.hasOwnProperty('paymentState')) {
-						paymentState = parseInt(bodyObj.paymentState);
-					}
-					let cancelReason = -1;
-					if (bodyObj.hasOwnProperty('cancelReason')) {
-						cancelReason = parseInt(bodyObj.cancelReason);
-					}
-
-					res.end(JSON.stringify({
-						code: 0,
-						plaatform: 'Google',
-						type: 'subscription',
-						app_id: purchaseData.packageName,
-						product_id: purchaseData.productId,
-						status: 0,
-						transaction_id: '',
-						original_transaction_id: '',
-						developer_payload: bodyObj.developerPayload,
-						purchase_state: -1,
-						consumption_state: -1,
-						auto_renewing: !!JSON.parse(bodyObj.autoRenewing),
-						price_currency_code: bodyObj.priceCurrencyCode,
-						price_amount_micros: parseInt(bodyObj.priceAmountMicros),
-						country_code: bodyObj.countryCode,
-						payment_state: paymentState,
-						cancel_reason: cancelReason,
-						original_purchase_date: parseInt(bodyObj.startTimeMillis),
-						expires_date: parseInt(bodyObj.expiryTimeMillis),
-					}));
-				}
-			} catch (parseErr) {
-				log('Google parsing receipt failed: ' + body);
 				res.end(JSON.stringify({
-					code: 103,
-					receipt: body,
-					error: 'Parsing receipt failed.',
+					code: 0,
+					plaatform: 'Google',
+					type: 'iap',
+					app_id: purchaseData.packageName,
+					product_id: purchaseData.productId,
+					status: 0,
+					transaction_id: '',
+					original_transaction_id: '',
+					developer_payload: bodyObj.developerPayload,
+					purchase_state: purchaseState,
+					consumption_state: consumptionState,
+					auto_renewing: false,
+					price_currency_code: '',
+					price_amount_micros: 0,
+					country_code: '',
+					payment_state: -1,
+					cancel_reason: -1,
+					is_trial_period: false,
+					original_purchase_date: parseInt(bodyObj.purchaseTimeMillis),
+					expires_date: 0,
 				}));
 			}
-		}
-	);
+			// Subscription
+			else if (type == 'subscription') {
+				if (!bodyObj.hasOwnProperty('startTimeMillis')
+				||  !bodyObj.hasOwnProperty('expiryTimeMillis')
+				||  !bodyObj.hasOwnProperty('autoRenewing')
+				||  !bodyObj.hasOwnProperty('priceCurrencyCode')
+				||  !bodyObj.hasOwnProperty('priceAmountMicros')
+				||  !bodyObj.hasOwnProperty('countryCode'))
+				{
+					throw new Error('Fail to parsing Google receipt.');
+				}
+
+				let paymentState = -1;
+				if (bodyObj.hasOwnProperty('paymentState')) {
+					paymentState = parseInt(bodyObj.paymentState);
+				}
+				let cancelReason = -1;
+				if (bodyObj.hasOwnProperty('cancelReason')) {
+					cancelReason = parseInt(bodyObj.cancelReason);
+				}
+
+				res.end(JSON.stringify({
+					code: 0,
+					plaatform: 'Google',
+					type: 'subscription',
+					app_id: purchaseData.packageName,
+					product_id: purchaseData.productId,
+					status: 0,
+					transaction_id: '',
+					original_transaction_id: '',
+					developer_payload: bodyObj.developerPayload,
+					purchase_state: -1,
+					consumption_state: -1,
+					auto_renewing: !!JSON.parse(bodyObj.autoRenewing),
+					price_currency_code: bodyObj.priceCurrencyCode,
+					price_amount_micros: parseInt(bodyObj.priceAmountMicros),
+					country_code: bodyObj.countryCode,
+					payment_state: paymentState,
+					cancel_reason: cancelReason,
+					original_purchase_date: parseInt(bodyObj.startTimeMillis),
+					expires_date: parseInt(bodyObj.expiryTimeMillis),
+				}));
+			}
+
+		});
+	});
 });
