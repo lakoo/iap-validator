@@ -54,10 +54,10 @@ paths:
                 description: (reserved)
               transaction_id:
                 type: string
-                description: (reserved)
+                description: The transaction ID of the receipt.
               original_transaction_id:
                 type: string
-                description: (reserved)
+                description: The original transaction ID of the receipt.
               developer_payload:
                 type: string
                 description: A developer-specified string that contains supplemental information about an order.
