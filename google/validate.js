@@ -16,7 +16,8 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 		purchaseData = JSON.parse(req.params.purchase_data);
 		if (!purchaseData.hasOwnProperty('packageName')
 		||  !purchaseData.hasOwnProperty('productId')
-		||  !purchaseData.hasOwnProperty('purchaseToken')) {
+		||  !purchaseData.hasOwnProperty('purchaseToken')
+		||  !purchaseData.hasOwnProperty('orderId')) {
 			throw new Error('Invalid purchase data');
 		}
 	} catch (err) {
@@ -133,8 +134,8 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 					app_id: purchaseData.packageName,
 					product_id: purchaseData.productId,
 					status: 0,
-					transaction_id: '',
-					original_transaction_id: '',
+					transaction_id: purchaseData.orderId,
+					original_transaction_id: purchaseData.orderId,
 					developer_payload: bodyObj.developerPayload,
 					purchase_state: purchaseState,
 					consumption_state: consumptionState,
@@ -177,8 +178,8 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 					app_id: purchaseData.packageName,
 					product_id: purchaseData.productId,
 					status: 0,
-					transaction_id: '',
-					original_transaction_id: '',
+					transaction_id: purchaseData.orderId,
+					original_transaction_id: purchaseData.orderId,
 					developer_payload: bodyObj.developerPayload,
 					purchase_state: -1,
 					consumption_state: -1,
