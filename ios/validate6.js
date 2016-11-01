@@ -37,13 +37,22 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 			if (appleErr) {
 				// Error from Apple.
 				try {
-					log('iOS verification failed: ' + appleErr.toString());
-					res.end(JSON.stringify({
-						code: 101,
-						status: reply.status,
-						receipt: JSON.stringify(reply),
-						error: 'Verification failed: ' + appleErr.toString(),
-					}));
+					if ( 'failed to validate for empty purchased list' === appleErr.message) {
+						res.end(JSON.stringify({
+							code: 201,
+							status: reply.status,
+							message: 'the receipt is valid, but purchased nothing',
+							product_original_purchase_date_ms: 0,
+						}));
+					} else {
+						log('iOS verification failed: ' + appleErr.toString());
+						res.end(JSON.stringify({
+							code: 101,
+							status: reply.status,
+							receipt: JSON.stringify(reply),
+							error: 'Verification failed: ' + appleErr.toString(),
+						}));
+					}
 				} catch (exception) {
 					log('iOS parsing receipt failed: ' + JSON.stringify(reply));
 					res.end(JSON.stringify({
@@ -88,6 +97,7 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 							is_trial_period: false,
 							original_purchase_date: parseInt(reply.latest_receipt_info.original_purchase_date_ms),
 							expires_date: parseInt(reply.latest_receipt_info.expires_date),
+							product_original_purchase_date_ms: 0,
 						}));
 					}
 					// IAP.
@@ -120,6 +130,7 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 							cancel_reason: 0,
 							is_trial_period: false,
 							original_purchase_date: parseInt(reply.receipt.original_purchase_date_ms),
+							product_original_purchase_date_ms: 0,
 							expires_date: 0,
 						}));
 					}

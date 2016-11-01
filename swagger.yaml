@@ -94,6 +94,9 @@ paths:
               expires_date:
                 type: integer
                 description: (subscription only, otherwise 0) The Epoch timestamp in milliseconds of epiration.
+              product_original_purchase_date_ms:
+                type: integer
+                description: (reserved)
         default:
           description: unepected error
           schema:
@@ -190,6 +193,25 @@ paths:
               expires_date:
                 type: integer
                 description: (subscription only, otherwise 0) The Epoch timestamp in milliseconds of epiration.
+              product_original_purchase_date_ms:
+                type: integer
+                description: (reserved)
+        201:
+          description: (Returns HTTP 200) The receipt is valid, but purchased nothing
+          schema:
+            properties:
+              code:
+                type: integer
+                description: 0 - constant value, indicate the success of validation.
+              status:
+                type: integer
+                description: The status code of the receipt if have.
+              message:
+                type: string
+                description: The detail of the message.
+              product_original_purchase_date_ms:
+                type: integer
+                description: (reserved)
         default:
           description: unepected error
           schema:
@@ -294,6 +316,25 @@ paths:
               expires_date:
                 type: integer
                 description: (subscription only, otherwise 0) The Epoch timestamp in milliseconds of epiration.
+              product_original_purchase_date_ms:
+                type: integer
+                description: The Epoch timestamp in milliseconds of the application's original purchase date.
+        201:
+          description: (Returns HTTP 200) The receipt is valid, but purchased nothing
+          schema:
+            properties:
+              code:
+                type: integer
+                description: 0 - constant value, indicate the success of validation.
+              status:
+                type: integer
+                description: The status code of the receipt if have.
+              message:
+                type: string
+                description: The detail of the message.
+              product_original_purchase_date_ms:
+                type: integer
+                description: The Epoch timestamp in milliseconds of the application's original purchase date.
         default:
           description: unepected error
           schema:
