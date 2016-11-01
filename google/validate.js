@@ -69,6 +69,7 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 				receipt: req.params.purchase_data,
 				error: 'Verification failed: ' + err.toString(),
 			}));
+			return;
 		}
 
 		let requestGoogleAPI = null;
@@ -98,6 +99,7 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 					receipt: req.params.purchase_data,
 					error: 'Verification failed: ' + err.toString(),
 				}));
+				return;
 			}
 			if (!bodyObj.hasOwnProperty('kind')
 			||  !bodyObj.hasOwnProperty('developerPayload'))
