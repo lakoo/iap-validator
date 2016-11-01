@@ -136,6 +136,17 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 						type = output.type;
 					}
 
+					if (!finalReceipt) {
+						log('iOS iap product' + req.params.product_id + 'not found in receitpt: ' + JSON.stringify(reply));
+						res.end(JSON.stringify({
+							code: 202,
+							status: reply.status,
+							message: 'the receipt is valid, but target product_id not found: ' + req.params.product_id,
+							product_original_purchase_date_ms: reply.receipt ? reply.receipt.original_purchase_date_ms : 0,
+						}));
+						return;
+					}
+
 					let isTrialPeriod = false;
 					if (finalReceipt.hasOwnProperty('is_trial_period')) {
 						isTrialPeriod = !!JSON.parse(finalReceipt.is_trial_period);

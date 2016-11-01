@@ -202,7 +202,7 @@ paths:
             properties:
               code:
                 type: integer
-                description: 0 - constant value, indicate the success of validation.
+                description: 201 - constant value, indicate the status of validation.
               status:
                 type: integer
                 description: The status code of the receipt if have.
@@ -325,7 +325,23 @@ paths:
             properties:
               code:
                 type: integer
-                description: 0 - constant value, indicate the success of validation.
+                description: 201 - constant value, indicate the status of validation.
+              status:
+                type: integer
+                description: The status code of the receipt if have.
+              message:
+                type: string
+                description: The detail of the message.
+              product_original_purchase_date_ms:
+                type: integer
+                description: The Epoch timestamp in milliseconds of the application's original purchase date.
+        202:
+          description: (Returns HTTP 200) The receipt is valid, but target iap-product was not found
+          schema:
+            properties:
+              code:
+                type: integer
+                description: 202 - constant value, indicate the status of validation.
               status:
                 type: integer
                 description: The status code of the receipt if have.
