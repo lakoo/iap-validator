@@ -16,10 +16,10 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 		purchaseData = JSON.parse(req.params.purchase_data);
 		if (!purchaseData.hasOwnProperty('packageName')
 		||  !purchaseData.hasOwnProperty('productId')
-		||  !purchaseData.hasOwnProperty('purchaseToken')
-		||  !purchaseData.hasOwnProperty('orderId')) {
+		||  !purchaseData.hasOwnProperty('purchaseToken')) {
 			throw new Error('Invalid purchase data');
 		}
+		if (!purchaseData.hasOwnProperty('orderId')) purchaseData.orderId = "";
 	} catch (err) {
 		log('Google invalid purchase data: ' + req.params.purchase_data);
 		res.end(JSON.stringify({
