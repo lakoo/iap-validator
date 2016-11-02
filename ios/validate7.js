@@ -81,12 +81,21 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 				// Error from Apple.
 				try {
 					log('iOS verification failed: ' + appleErr.toString());
-					res.end(JSON.stringify({
-						code: 101,
-						status: reply.status,
-						receipt: JSON.stringify(reply),
-						error: 'Verification failed: ' + appleErr.toString(),
-					}));
+					if ( 'failed to validate for empty purchased list' === appleErr.message) {
+						res.end(JSON.stringify({
+							code: 201,
+							status: reply.status,
+							message: 'the receipt is valid, but purchased nothing',
+							product_original_purchase_date_ms: reply.receipt ? reply.receipt.original_purchase_date_ms : 0,
+						}));
+					} else {
+						res.end(JSON.stringify({
+							code: 101,
+							status: reply.status,
+							receipt: JSON.stringify(reply),
+							error: 'Verification failed: ' + appleErr.toString(),
+						}));
+					}
 				} catch (exception) {
 					log('iOS parsing receipt failed: ' + JSON.stringify(reply));
 					res.end(JSON.stringify({
@@ -127,6 +136,17 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 						type = output.type;
 					}
 
+					if (!finalReceipt) {
+						log('iOS iap product' + req.params.product_id + 'not found in receitpt: ' + JSON.stringify(reply));
+						res.end(JSON.stringify({
+							code: 202,
+							status: reply.status,
+							message: 'the receipt is valid, but target product_id not found: ' + req.params.product_id,
+							product_original_purchase_date_ms: reply.receipt ? reply.receipt.original_purchase_date_ms : 0,
+						}));
+						return;
+					}
+
 					let isTrialPeriod = false;
 					if (finalReceipt.hasOwnProperty('is_trial_period')) {
 						isTrialPeriod = !!JSON.parse(finalReceipt.is_trial_period);
@@ -152,6 +172,7 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 						is_trial_period: isTrialPeriod,
 						original_purchase_date: parseInt(finalReceipt.original_purchase_date_ms),
 						expires_date: ((type === 'subscription') ? latestTime : 0),
+						product_original_purchase_date_ms: reply.receipt.original_purchase_date_ms,
 					}));
 
 					if (config['DEBUG']) {

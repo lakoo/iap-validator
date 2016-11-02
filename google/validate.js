@@ -16,10 +16,10 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 		purchaseData = JSON.parse(req.params.purchase_data);
 		if (!purchaseData.hasOwnProperty('packageName')
 		||  !purchaseData.hasOwnProperty('productId')
-		||  !purchaseData.hasOwnProperty('purchaseToken')
-		||  !purchaseData.hasOwnProperty('orderId')) {
+		||  !purchaseData.hasOwnProperty('purchaseToken')) {
 			throw new Error('Invalid purchase data');
 		}
+		if (!purchaseData.hasOwnProperty('orderId')) purchaseData.orderId = "";
 	} catch (err) {
 		log('Google invalid purchase data: ' + req.params.purchase_data);
 		res.end(JSON.stringify({
@@ -69,6 +69,7 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 				receipt: req.params.purchase_data,
 				error: 'Verification failed: ' + err.toString(),
 			}));
+			return;
 		}
 
 		let requestGoogleAPI = null;
@@ -98,6 +99,7 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 					receipt: req.params.purchase_data,
 					error: 'Verification failed: ' + err.toString(),
 				}));
+				return;
 			}
 			if (!bodyObj.hasOwnProperty('kind')
 			||  !bodyObj.hasOwnProperty('developerPayload'))
@@ -148,6 +150,7 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 					is_trial_period: false,
 					original_purchase_date: parseInt(bodyObj.purchaseTimeMillis),
 					expires_date: 0,
+					product_original_purchase_date_ms: 0,
 				}));
 			}
 			// Subscription
@@ -191,6 +194,7 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 					cancel_reason: cancelReason,
 					original_purchase_date: parseInt(bodyObj.startTimeMillis),
 					expires_date: parseInt(bodyObj.expiryTimeMillis),
+					product_original_purchase_date_ms: 0,
 				}));
 			}
 
