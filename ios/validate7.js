@@ -161,6 +161,7 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 						status: reply.status,
 						transaction_id: finalReceipt.transaction_id,
 						original_transaction_id: finalReceipt.original_transaction_id,
+						developer_payload: '',
 						purchase_state: 0,
 						consumption_state: 0,
 						auto_renewing: false,
