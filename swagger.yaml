@@ -97,6 +97,9 @@ paths:
               product_original_purchase_date_ms:
                 type: integer
                 description: (reserved)
+              download_id:
+                type: string
+                description: (reserved)
         default:
           description: unepected error
           schema:
@@ -196,6 +199,9 @@ paths:
               product_original_purchase_date_ms:
                 type: integer
                 description: (reserved)
+              download_id:
+                type: string
+                description: (reserved)
         201:
           description: (Returns HTTP 200) The receipt is valid, but purchased nothing
           schema:
@@ -211,6 +217,9 @@ paths:
                 description: The detail of the message.
               product_original_purchase_date_ms:
                 type: integer
+                description: (reserved)
+              download_id:
+                type: string
                 description: (reserved)
         default:
           description: unepected error
@@ -319,6 +328,9 @@ paths:
               product_original_purchase_date_ms:
                 type: integer
                 description: The Epoch timestamp in milliseconds of the application's original purchase date.
+              download_id:
+                type: string
+                description: The download id (seems to be the purchase id) of the application receipt, will be '0' for sandbox environment.
         201:
           description: (Returns HTTP 200) The receipt is valid, but purchased nothing
           schema:
@@ -335,6 +347,9 @@ paths:
               product_original_purchase_date_ms:
                 type: integer
                 description: The Epoch timestamp in milliseconds of the application's original purchase date.
+              download_id:
+                type: string
+                description: The download id (seems to be the purchase id) of the application receipt, will be '0' for sandbox environment.
         202:
           description: (Returns HTTP 200) The receipt is valid, but target iap-product was not found
           schema:
@@ -351,6 +366,9 @@ paths:
               product_original_purchase_date_ms:
                 type: integer
                 description: The Epoch timestamp in milliseconds of the application's original purchase date.
+              download_id:
+                type: string
+                description: The download id (seems to be the purchase id) of the application receipt, will be '0' for sandbox environment.
         default:
           description: unepected error
           schema:

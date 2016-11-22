@@ -43,6 +43,7 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 							status: reply.status,
 							message: 'the receipt is valid, but purchased nothing',
 							product_original_purchase_date_ms: 0,
+							download_id: '',
 						}));
 					} else {
 						log('iOS verification failed: ' + appleErr.toString());
@@ -99,6 +100,7 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 							original_purchase_date: parseInt(reply.latest_receipt_info.original_purchase_date_ms),
 							expires_date: parseInt(reply.latest_receipt_info.expires_date),
 							product_original_purchase_date_ms: 0,
+							download_id: '',
 						}));
 					}
 					// IAP.
@@ -134,6 +136,7 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 							original_purchase_date: parseInt(reply.receipt.original_purchase_date_ms),
 							expires_date: 0,
 							product_original_purchase_date_ms: 0,
+							download_id: '',
 						}));
 					}
 				} catch (err) {

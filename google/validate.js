@@ -151,6 +151,7 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 					original_purchase_date: parseInt(bodyObj.purchaseTimeMillis),
 					expires_date: 0,
 					product_original_purchase_date_ms: 0,
+					download_id: '',
 				}));
 			}
 			// Subscription
@@ -196,6 +197,7 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 					original_purchase_date: parseInt(bodyObj.startTimeMillis),
 					expires_date: parseInt(bodyObj.expiryTimeMillis),
 					product_original_purchase_date_ms: 0,
+					download_id: '',
 				}));
 			}
 
