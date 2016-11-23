@@ -131,7 +131,7 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 
 				res.end(JSON.stringify({
 					code: 0,
-					plaatform: 'Google',
+					platform: 'Google',
 					type: 'iap',
 					app_id: purchaseData.packageName,
 					product_id: purchaseData.productId,
@@ -151,6 +151,7 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 					original_purchase_date: parseInt(bodyObj.purchaseTimeMillis),
 					expires_date: 0,
 					product_original_purchase_date_ms: 0,
+					download_id: '',
 				}));
 			}
 			// Subscription
@@ -176,7 +177,7 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 
 				res.end(JSON.stringify({
 					code: 0,
-					plaatform: 'Google',
+					platform: 'Google',
 					type: 'subscription',
 					app_id: purchaseData.packageName,
 					product_id: purchaseData.productId,
@@ -192,9 +193,11 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 					country_code: bodyObj.countryCode,
 					payment_state: paymentState,
 					cancel_reason: cancelReason,
+					is_trial_period: false,
 					original_purchase_date: parseInt(bodyObj.startTimeMillis),
 					expires_date: parseInt(bodyObj.expiryTimeMillis),
 					product_original_purchase_date_ms: 0,
+					download_id: '',
 				}));
 			}
 

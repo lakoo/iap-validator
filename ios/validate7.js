@@ -87,6 +87,7 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 							status: reply.status,
 							message: 'the receipt is valid, but purchased nothing',
 							product_original_purchase_date_ms: reply.receipt ? reply.receipt.original_purchase_date_ms : 0,
+							download_id: reply.receipt ? reply.receipt.download_id.toString() : '',
 						}));
 					} else {
 						res.end(JSON.stringify({
@@ -143,6 +144,7 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 							status: reply.status,
 							message: 'the receipt is valid, but target product_id not found: ' + req.params.product_id,
 							product_original_purchase_date_ms: reply.receipt ? reply.receipt.original_purchase_date_ms : 0,
+							download_id: reply.receipt ? reply.receipt.download_id.toString() : '',
 						}));
 						return;
 					}
@@ -161,6 +163,7 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 						status: reply.status,
 						transaction_id: finalReceipt.transaction_id,
 						original_transaction_id: finalReceipt.original_transaction_id,
+						developer_payload: '',
 						purchase_state: 0,
 						consumption_state: 0,
 						auto_renewing: false,
@@ -173,6 +176,7 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 						original_purchase_date: parseInt(finalReceipt.original_purchase_date_ms),
 						expires_date: ((type === 'subscription') ? latestTime : 0),
 						product_original_purchase_date_ms: reply.receipt.original_purchase_date_ms,
+						download_id: reply.receipt.download_id.toString(),
 					}));
 
 					if (config['DEBUG']) {
