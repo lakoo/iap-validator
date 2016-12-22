@@ -1,0 +1,30 @@
+general:
+  branches:
+    only:
+      - master
+
+machine:
+  environment:
+    PORT: 8080
+
+dependencies:
+  pre:
+    - echo $GCLOUD_SERVICE_KEY | base64 --decode > ${HOME}/client-secret.json
+    - gcloud --quiet components update app
+    - gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
+    - gcloud config set project $GCLOUD_PROJECT
+    - rm .gitignore
+    - echo $IAP_CONFIG | base64 --decode > config.js
+
+test:
+  override:
+    - npm start:
+        background: true
+    - sleep 5
+    - curl --retry 10 --retry-delay 5 -v http://localhost:8080/
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - gcloud -q app deploy
