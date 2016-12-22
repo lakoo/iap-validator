@@ -2,14 +2,20 @@
   "name": "purchase-validator",
   "version": "1.2.0",
   "description": "Use to validate the purchase (IAP and subscription) from Apple Store and Google Play Store",
+  "engines": {
+    "node": ">=6.0.0 <7.0.0"
+  },
   "main": "app.js",
   "dependencies": {
-    "body-parser": "^1.15.1",
-    "express": "^4.13.4",
-    "googleapis": "^14.0.0",
-    "in-app-purchase": "^1.1.7",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "googleapis": "^15.0.0",
+    "in-app-purchase": "^1.1.10",
     "node-slack": "0.0.7"
   },
   "devDependencies": {},
-  "author": "Aludirk"
+  "author": "Aludirk",
+  "scripts": {
+    "start": "node app.js"
+  }
 }
