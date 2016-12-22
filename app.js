@@ -25,6 +25,11 @@ require('./google/validate.js');
 require('./ios/validate6.js');
 require('./ios/validate7.js');
 
-let server = app.listen(config['PORT'], function() {
+
+app.get('/', function(req, res) {
+	res.sendStatus(200);
+});
+
+let server = app.listen( process.env.PORT || config['PORT'] , function() {
 	log('Purchase Validator is running on port: %s', server.address().port);
 });
