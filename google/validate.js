@@ -2,12 +2,13 @@
 
 const config = require('../config.js');
 
-let os = require("os");
-let util = require('util');
-let google = require('googleapis');
-let Slack = require('node-slack');
+const os = require("os");
+const google = require('googleapis');
+const Slack = require('node-slack');
+const express = require('express');
+const router = express.Router();
 
-app.get('/validate/google/:purchase_data', function(req, res) {
+router.get('/:purchase_data', function(req, res) {
 	// Set up response.
 	res.writeHead(200, {'Content-Type': 'application/json'});
 
@@ -204,3 +205,6 @@ app.get('/validate/google/:purchase_data', function(req, res) {
 		});
 	});
 });
+
+module.exports = router;
+

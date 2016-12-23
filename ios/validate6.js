@@ -2,9 +2,11 @@
 
 const config = require('../config.js');
 
-let iap = require('in-app-purchase');
+const iap = require('in-app-purchase');
+const express = require('express');
+const router = express.Router();
 
-app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
+router.get('/:bundle/:receipt', function(req, res) {
 	// Config IAP.
 	if (config['IOS'][req.params.bundle] === 'undefined') {
 		// Invalid configuration.
@@ -162,3 +164,5 @@ app.get('/validate/ios/6/:bundle/:receipt', function(req, res) {
 		});
 	});
 });
+
+module.exports = router;
