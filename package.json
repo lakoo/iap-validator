@@ -12,9 +12,18 @@
     "in-app-purchase": "^1.1.10",
     "node-slack": "0.0.7"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^3.12.2",
+    "eslint-config-airbnb": "^13.0.0",
+    "eslint-config-airbnb-base": "^11.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.8.0"
+  },
   "author": "Aludirk",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "lint": "eslint app.js log.js google/*.js ios/*.js",
+    "test" : "npm run lint"
   }
 }
