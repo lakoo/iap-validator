@@ -2,7 +2,9 @@
 
 const config = require('../config.js');
 
-let iap = require('in-app-purchase');
+const iap = require('in-app-purchase');
+const express = require('express');
+const router = express.Router();
 
 function findLatestReceipt(productID, receipts){
 	let finalReceipt = null;
@@ -47,7 +49,7 @@ function findLatestReceipt(productID, receipts){
 	return {'receipt':finalReceipt, 'latest_ms':latestTime, 'type':type};
 }
 
-app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
+router.get('/:bundle/:receipt/:product_id', function(req, res) {
 	// Config IAP.
 	if (config['IOS'][req.params.bundle] === 'undefined') {
 		// Invalid configuration.
@@ -205,3 +207,5 @@ app.get('/validate/ios/7/:bundle/:receipt/:product_id', function(req, res) {
 		});
 	});
 });
+
+module.exports = router;

@@ -1,16 +1,14 @@
 'use strict';
 
 require('./log.js');
-
 const config = require('./config.js');
 
-let bodyParser = require('body-parser');
-let express = require('express');
-global.app = express();
+const express = require('express');
+const googleRouter = require('./google/validate.js');
+const ios6Router = require('./ios/validate6.js');
+const ios7Router = require('./ios/validate7.js');
 
-app.use(bodyParser.urlencoded({
-	extended: true
-}));
+const app = express();
 
 // Set cross-origin HTTP request (CORS) for swagger testing.
 if (config['DEBUG']) {
@@ -21,10 +19,9 @@ if (config['DEBUG']) {
 	});
 }
 
-require('./google/validate.js');
-require('./ios/validate6.js');
-require('./ios/validate7.js');
-
+app.use('/validate/google', googleRouter);
+app.use('/validate/ios/6', ios6Router);
+app.use('/validate/ios/7', ios7Router);
 
 app.get('/', function(req, res) {
 	res.sendStatus(200);
