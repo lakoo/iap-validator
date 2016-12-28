@@ -4,6 +4,8 @@ general:
       - master
 
 machine:
+  node:
+    version: 6.9.2
   environment:
     PORT: 8080
 
