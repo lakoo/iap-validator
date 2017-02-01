@@ -19,7 +19,7 @@ dependencies:
     - echo $IAP_CONFIG | base64 --decode > config.js
 
 test:
-  override:
+  post:
     - npm start:
         background: true
     - sleep 5
