@@ -7,7 +7,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const googleRouterV1 = require('./google/validate_v1.js');
 const googleRouterV2 = require('./google/validate_v2.js');
-const ios6Router = require('./ios/validate6.js');
+const ios6RouterV1 = require('./ios/validate6_v1.js');
+const ios6RouterV2 = require('./ios/validate6_v2.js');
 const ios7RouterV1 = require('./ios/validate7_v1.js');
 const ios7RouterV2 = require('./ios/validate7_v2.js');
 
@@ -32,7 +33,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/validate/google', googleRouterV1);
 app.use('/v2/validate/google', googleRouterV2);
-app.use('/validate/ios/6', ios6Router);
+app.use('/validate/ios/6', ios6RouterV1);
+app.use('/v2/validate/ios/6', ios6RouterV2);
 app.use('/validate/ios/7', ios7RouterV1);
 app.use('/v2/validate/ios/7', ios7RouterV2);
 
