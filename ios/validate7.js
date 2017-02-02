@@ -2,9 +2,6 @@ const config = require('../config.js');
 const log = require('../log.js');
 
 const iap = require('in-app-purchase');
-const express = require('express');
-
-const router = express.Router();
 
 function findLatestReceipt(productID, receipts) {
   let finalReceipt = null;
@@ -46,28 +43,25 @@ function findLatestReceipt(productID, receipts) {
   return { receipt: finalReceipt, latest_ms: latestTime, type };
 }
 
-router.get('/:bundle/:receipt/:product_id', (req, res) => {
+function validate(bundle, receipt, productID, callback) {
   // Config IAP.
-  if (config.IOS[req.params.bundle] === 'undefined') {
+  if (config.IOS[bundle] === 'undefined') {
     // Invalid configuration.
     log('iOS configuration error.');
-    res.end(JSON.stringify({
+    callback(JSON.stringify({
       code: 102,
       error: 'Configuration error.',
     }));
     return;
   }
-  iap.config(config.IOS[req.params.bundle]);
-
-  // Set up response.
-  res.writeHead(200, { 'Content-Type': 'application/json' });
+  iap.config(config.IOS[bundle]);
 
   // Set up IAP.
   iap.setup((error) => {
     if (error) {
       // Fail to set up IAP.
       log(`iOS initialization error: ${error}`);
-      res.end(JSON.stringify({
+      callback(JSON.stringify({
         code: 102,
         error: `Initialization error: ${error.toString()}`,
       }));
@@ -75,13 +69,13 @@ router.get('/:bundle/:receipt/:product_id', (req, res) => {
     }
 
     // Validate the IAP.
-    iap.validate(iap.APPLE, req.params.receipt, (appleErr, reply) => {
+    iap.validate(iap.APPLE, receipt, (appleErr, reply) => {
       if (appleErr) {
         // Error from Apple.
         try {
           log(`iOS verification failed: ${appleErr.toString()}`);
           if (appleErr.message === 'failed to validate for empty purchased list') {
-            res.end(JSON.stringify({
+            callback(JSON.stringify({
               code: 201,
               status: reply.status,
               message: 'the receipt is valid, but purchased nothing',
@@ -90,7 +84,7 @@ router.get('/:bundle/:receipt/:product_id', (req, res) => {
               download_id: reply.receipt ? reply.receipt.download_id.toString() : '',
             }));
           } else {
-            res.end(JSON.stringify({
+            callback(JSON.stringify({
               code: 101,
               status: reply.status,
               receipt: JSON.stringify(reply),
@@ -99,7 +93,7 @@ router.get('/:bundle/:receipt/:product_id', (req, res) => {
           }
         } catch (exception) {
           log(`iOS parsing receipt failed: ${JSON.stringify(reply)}`);
-          res.end(JSON.stringify({
+          callback(JSON.stringify({
             code: 103,
             error: `Verification and parsing receipt failed: ${appleErr.toString()} ${JSON.stringify(reply)}`,
           }));
@@ -122,14 +116,14 @@ router.get('/:bundle/:receipt/:product_id', (req, res) => {
 
           // Handle 'latest_receipt_info', deprecated field
           if (Object.prototype.hasOwnProperty.call(reply, 'latest_receipt_info')) {
-            const output = findLatestReceipt(req.params.product_id, reply.latest_receipt_info);
+            const output = findLatestReceipt(productID, reply.latest_receipt_info);
             finalReceipt = output.receipt;
             latestTime = output.latest_ms;
             type = output.type;
           }
 
           // Handle 'in_app'
-          const output = findLatestReceipt(req.params.product_id, reply.receipt.in_app);
+          const output = findLatestReceipt(productID, reply.receipt.in_app);
           if (output.latest_ms > latestTime) {
             finalReceipt = output.receipt;
             latestTime = output.latest_ms;
@@ -137,11 +131,11 @@ router.get('/:bundle/:receipt/:product_id', (req, res) => {
           }
 
           if (!finalReceipt) {
-            log(`iOS iap product ${req.params.product_id} not found in receitpt: ${JSON.stringify(reply)}`);
-            res.end(JSON.stringify({
+            log(`iOS iap product ${productID} not found in receitpt: ${JSON.stringify(reply)}`);
+            callback(JSON.stringify({
               code: 202,
               status: reply.status,
-              message: `the receipt is valid, but target product_id not found: ${req.params.product_id}`,
+              message: `the receipt is valid, but target product_id not found: ${productID}`,
               product_original_purchase_date_ms:
                   reply.receipt ? reply.receipt.original_purchase_date_ms : 0,
               download_id: reply.receipt ? reply.receipt.download_id.toString() : '',
@@ -154,7 +148,7 @@ router.get('/:bundle/:receipt/:product_id', (req, res) => {
             isTrialPeriod = !!JSON.parse(finalReceipt.is_trial_period);
           }
 
-          res.end(JSON.stringify({
+          callback(JSON.stringify({
             code: 0,
             platform: 'iOS',
             type,
@@ -184,7 +178,7 @@ router.get('/:bundle/:receipt/:product_id', (req, res) => {
           }
         } catch (err) {
           log(`iOS parsing receipt failed: ${JSON.stringify(reply)}`);
-          res.end(JSON.stringify({
+          callback(JSON.stringify({
             code: 103,
             receipt: JSON.stringify(reply),
             error: `Parsing receipt failed (${err.toString()}).`,
@@ -193,7 +187,7 @@ router.get('/:bundle/:receipt/:product_id', (req, res) => {
       } else {
         // Validation failed.
         log(`Validation failed: ${JSON.stringify(reply)}`);
-        res.end(JSON.stringify({
+        callback(JSON.stringify({
           code: 104,
           status: reply.status,
           receipt: JSON.stringify(reply),
@@ -202,6 +196,6 @@ router.get('/:bundle/:receipt/:product_id', (req, res) => {
       }
     });
   });
-});
+}
 
-module.exports = router;
+module.exports = validate;
