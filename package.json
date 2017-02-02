@@ -7,6 +7,7 @@
   },
   "main": "app.js",
   "dependencies": {
+    "compression": "^1.6.2",
     "express": "^4.14.0",
     "googleapis": "^15.0.0",
     "in-app-purchase": "^1.1.10",
@@ -24,6 +25,6 @@
   "scripts": {
     "start": "node app.js",
     "lint": "eslint app.js log.js google/*.js ios/*.js",
-    "test" : "npm run lint"
+    "test": "npm run lint"
   }
 }

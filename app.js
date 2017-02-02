@@ -2,6 +2,7 @@
 const log = require('./log.js');
 const config = require('./config.js');
 
+const compression = require('compression');
 const express = require('express');
 const googleRouter = require('./google/validate.js');
 const ios6Router = require('./ios/validate6.js');
@@ -19,6 +20,9 @@ if (config.DEBUG) {
 } else {
   app.disable('x-powered-by');
 }
+
+// Support gzip
+app.use(compression());
 
 app.use('/validate/google', googleRouter);
 app.use('/validate/ios/6', ios6Router);
