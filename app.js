@@ -12,8 +12,8 @@ const app = express();
 // Set cross-origin HTTP request (CORS) for swagger testing.
 if (config.DEBUG) {
   app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin", "http://editor.swagger.io');
-    res.header('Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Origin', 'http://editor.swagger.io');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();
   });
 } else {
