@@ -6,17 +6,11 @@ const log = require('../log.js');
 const os = require('os');
 const google = require('googleapis');
 const Slack = require('node-slack');
-const express = require('express');
 
-const router = express.Router();
-
-router.get('/:purchase_data', (req, res) => {
-  // Set up response.
-  res.writeHead(200, { 'Content-Type': 'application/json' });
-
+function validate(reqPurchaseData, callback) {
   let purchaseData = '';
   try {
-    purchaseData = JSON.parse(req.params.purchase_data);
+    purchaseData = JSON.parse(reqPurchaseData);
     if (!Object.prototype.hasOwnProperty.call(purchaseData, 'packageName')
      || !Object.prototype.hasOwnProperty.call(purchaseData, 'productId')
      || !Object.prototype.hasOwnProperty.call(purchaseData, 'purchaseToken')) {
@@ -24,10 +18,10 @@ router.get('/:purchase_data', (req, res) => {
     }
     if (!Object.prototype.hasOwnProperty.call(purchaseData, 'orderId')) purchaseData.orderId = '';
   } catch (err) {
-    log(`Google invalid purchase data: ${req.params.purchase_data}`);
-    res.end(JSON.stringify({
+    log(`Google invalid purchase data: ${reqPurchaseData}`);
+    callback(JSON.stringify({
       code: 102,
-      error: `Invalid purchase data: ${req.params.purchase_data}`,
+      error: `Invalid purchase data: ${reqPurchaseData}`,
     }));
     return;
   }
@@ -36,7 +30,7 @@ router.get('/:purchase_data', (req, res) => {
   if (typeof config.GOOGLE[purchaseData.packageName] === 'undefined') {
     // Invalid configuration.
     log('Google configuration error.');
-    res.end(JSON.stringify({
+    callback(JSON.stringify({
       code: 102,
       error: 'Configuration error.',
     }));
@@ -45,20 +39,20 @@ router.get('/:purchase_data', (req, res) => {
   const configData = config.GOOGLE[purchaseData.packageName];
 
   const timeoutTimer = setTimeout(() => {
-    log(`Google request timeout ${req.params.purchase_data}`);
+    log(`Google request timeout ${reqPurchaseData}`);
 
     if (configData.SLACK_URL) {
       const slack = new Slack(configData.SLACK_URL);
       slack.send({
         username: os.hostname(),
         text: 'iap-validator ERROR',
-        attachments: [{ title: 'REQUEST TIMEOUT', color: 'danger', text: `platform: Google, payload: ${req.params.purchase_data}` }],
+        attachments: [{ title: 'REQUEST TIMEOUT', color: 'danger', text: `platform: Google, payload: ${reqPurchaseData}` }],
       });
     }
 
-    res.end(JSON.stringify({
+    callback(JSON.stringify({
       code: 110,
-      error: `Request timeout: ${req.params.purchase_data}`,
+      error: `Request timeout: ${reqPurchaseData}`,
     }));
   }, config.TIMEOUT);
 
@@ -66,9 +60,9 @@ router.get('/:purchase_data', (req, res) => {
   jwtClient.authorize((err, tokens) => {
     if (err) {
       log(`Google verification failed: ${err.toString()}`);
-      res.end(JSON.stringify({
+      callback(JSON.stringify({
         code: 101,
-        receipt: req.params.purchase_data,
+        receipt: reqPurchaseData,
         error: `Verification failed: ${err.toString()}`,
       }));
       return;
@@ -96,9 +90,9 @@ router.get('/:purchase_data', (req, res) => {
       clearTimeout(timeoutTimer);
       if (err2) {
         log(`Google verification failed: ${err2.toString()}`);
-        res.end(JSON.stringify({
+        callback(JSON.stringify({
           code: 101,
-          receipt: req.params.purchase_data,
+          receipt: reqPurchaseData,
           error: `Verification failed: ${err2.toString()}`,
         }));
         return;
@@ -128,7 +122,7 @@ router.get('/:purchase_data', (req, res) => {
           consumptionState = parseInt(bodyObj.consumptionState, 10);
         }
 
-        res.end(JSON.stringify({
+        callback(JSON.stringify({
           code: 0,
           platform: 'Google',
           type: 'iap',
@@ -171,7 +165,7 @@ router.get('/:purchase_data', (req, res) => {
           cancelReason = parseInt(bodyObj.cancelReason, 10);
         }
 
-        res.end(JSON.stringify({
+        callback(JSON.stringify({
           code: 0,
           platform: 'Google',
           type: 'subscription',
@@ -198,7 +192,6 @@ router.get('/:purchase_data', (req, res) => {
       }
     });
   });
-});
+}
 
-module.exports = router;
-
+module.exports = validate;

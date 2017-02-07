@@ -113,6 +113,107 @@ paths:
               receipt:
                 type: string
                 description: The receipt JSON from Google if have.
+  /v2/validate/google:
+    post:
+      description: To verify the status of iOS (IAP/subscription) from the given Google receipt.
+      parameters:
+        - name: purchase_data
+          in: body
+          description: The purchase data from Google to verify.
+          required: true
+          schema:
+            properties:
+              receipt:
+                type: string
+                description: The receipt data
+      tags:
+        - Google
+        - IAP
+        - Subscription
+      responses:
+        200:
+          description: Result of the subscription status
+          schema:
+            properties:
+              code:
+                type: integer
+                description: 0 - constant value, indicate the success of validation.
+              platform:
+                type: string
+                description: Google - constant string Google, indicate for Google platform.
+              type:
+                type: string
+                description: iap - for product type IAP; subscription - for product type Subscription.
+              app_id:
+                type: string
+                description: The package name of the purchase.
+              product_id:
+                type: string
+                description: The product ID of the purchase.
+              status:
+                type: integer
+                description: (reserved)
+              transaction_id:
+                type: string
+                description: The transaction ID of the receipt.
+              original_transaction_id:
+                type: string
+                description: The original transaction ID of the receipt.
+              developer_payload:
+                type: string
+                description: A developer-specified string that contains supplemental information about an order.
+              purchase_state:
+                type: integer
+                description: (iap only) The purchase state of the order. Possible values are - (-1:No such state, 0:Purchased, 1:Cancelled).
+              consumption_state:
+                type: integer
+                description: (iap only) The consumption state of the inapp product. Possible values are - (-1:No such state, 0:Yet to be consumed, 1:Consumed).
+              auto_renewing:
+                type: boolean
+                description: (subscription only) Whether the subscription will automatically be renewed when it reaches its current expiry time.
+              price_currency_code:
+                type: string
+                description: (subscription only) ISO 4217 currency code for the subscription price. For example, if the price is specified in British pounds sterling, price_currency_code is "GBP".
+              price_amount_micros:
+                type: integer
+                description: (subscription only) Price of the subscription, not including tax. Price is expressed in micro-units, where 1,000,000 micro-units equal one unit of the currency. For example, if the subscription price is €1.99, price_amount_micros is 1990000.
+              country_code:
+                type: string
+                description: (subscription only) ISO 3166-1 alpha-2 billing country/region code of the user at the time the subscription was granted.
+              payment_state:
+                type: integer
+                description: The payment state of the subscription. Possible values are - (-1:No such state, 0:Payment pending, 1:Payment received).
+              cancel_reason:
+                type: integer
+                description: (subscription only) The cancel reason of the subscription, if the subscription is not auto renewing. Possible values are - (-1:No such state, 0:User cancelled the subscription, 1:Subscription was cancelled by the system, for example because of a billing problem).
+              is_trial_period:
+                type: boolean
+                description: (reserved)
+              original_purchase_date:
+                type: integer
+                description: The Epoch timestamp in milliseconds of original purchase date.
+              expires_date:
+                type: integer
+                description: (subscription only, otherwise 0) The Epoch timestamp in milliseconds of epiration.
+              product_original_purchase_date_ms:
+                type: integer
+                description: (reserved)
+              download_id:
+                type: string
+                description: (reserved)
+        default:
+          description: unepected error
+          schema:
+            properties:
+              code:
+                type: integer
+                description: The error code.
+              error:
+                type: string
+                description: The detail of the error.
+              receipt:
+                type: string
+                description: The receipt JSON from Google if have.
   /validate/ios/6/{bundle}/{receipt}:
     get:
       description: To verify the status of iOS (IAP/subscription) from the given iOS 6 style receipt.
@@ -127,6 +228,134 @@ paths:
           description: The urlencoded base64 encoded string of the Apple receipt.
           required: true
           type: string
+      tags:
+        - IAP
+        - iOS
+        - Subscription
+      responses:
+        200:
+          description: Result of the IAP/subscription status
+          schema:
+            properties:
+              code:
+                type: integer
+                description: 0 - constant value, indicate the success of validation.
+              platform:
+                type: string
+                description: iOS - constant string iOS, indicate for iOS platform.
+              type:
+                type: string
+                description: iap - for product type IAP; subscription - for product type Subscription.
+              app_id:
+                type: string
+                description: The bundle ID of the purchase.
+              product_id:
+                type: string
+                description: The product ID of the purchase.
+              status:
+                type: integer
+                description: The status code of the receipt.
+              transaction_id:
+                type: string
+                description: The transaction ID of the receipt.
+              original_transaction_id:
+                type: string
+                description: The original transaction ID of the receipt.
+              developer_payload:
+                type: string
+                description: (reserved)
+              purchase_state:
+                type: integer
+                description: (reserved)
+              consumption_state:
+                type: integer
+                description: (reserved)
+              auto_renewing:
+                type: boolean
+                description: (reserved)
+              price_currency_code:
+                type: string
+                description: (reserved)
+              price_amount_micros:
+                type: integer
+                description: (reserved)
+              country_code:
+                type: string
+                description: (reserved)
+              payment_state:
+                type: integer
+                description: (reserved)
+              cancel_reason:
+                type: integer
+                description: (reserved)
+              is_trial_period:
+                type: boolean
+                description: (reserved)
+              original_purchase_date:
+                type: integer
+                description: The Epoch timestamp in milliseconds of original purchase date.
+              expires_date:
+                type: integer
+                description: (subscription only, otherwise 0) The Epoch timestamp in milliseconds of epiration.
+              product_original_purchase_date_ms:
+                type: integer
+                description: (reserved)
+              download_id:
+                type: string
+                description: (reserved)
+        201:
+          description: (Returns HTTP 200) The receipt is valid, but purchased nothing
+          schema:
+            properties:
+              code:
+                type: integer
+                description: 201 - constant value, indicate the status of validation.
+              status:
+                type: integer
+                description: The status code of the receipt if have.
+              message:
+                type: string
+                description: The detail of the message.
+              product_original_purchase_date_ms:
+                type: integer
+                description: (reserved)
+              download_id:
+                type: string
+                description: (reserved)
+        default:
+          description: unepected error
+          schema:
+            properties:
+              code:
+                type: integer
+                description: The error code.
+              error:
+                type: string
+                description: The detail of the error.
+              status:
+                type: integer
+                description: The status code of the receipt if have.
+              receipt:
+                type: string
+                description: The receipt JSON from Apple if have.
+  /v2/validate/ios/6/{bundle}:
+    post:
+      description: To verify the status of iOS (IAP/subscription) from the given iOS 6 style receipt.
+      parameters:
+        - name: bundle
+          in: path
+          description: The bundle ID of the application.
+          required: true
+          type: string
+        - name: receipt
+          in: body
+          description: The base64 encoded string of the Apple receipt.
+          required: true
+          schema:
+            properties:
+              receipt:
+                type: string
+                description: The receipt data
       tags:
         - IAP
         - iOS
@@ -256,6 +485,158 @@ paths:
           description: The product ID to validate.
           required: true
           type: string
+      tags:
+        - IAP
+        - iOS
+        - Subscription
+      responses:
+        200:
+          description: Result of the IAP/subscription status
+          schema:
+            properties:
+              code:
+                type: integer
+                description: 0 - constant value, indicate the success of validation.
+              platform:
+                type: string
+                description: iOS - constant string iOS, indicate for iOS platform.
+              type:
+                type: string
+                description: iap - for product type IAP; subscription - for product type Subscription.
+              app_id:
+                type: string
+                description: The bundle ID of the purchase.
+              product_id:
+                type: string
+                description: The product ID of the purchase.
+              status:
+                type: integer
+                description: The status code of the receipt.
+              transaction_id:
+                type: string
+                description: The transaction ID of the receipt.
+              original_transaction_id:
+                type: string
+                description: The original transaction ID of the receipt.
+              developer_payload:
+                type: string
+                description: (reserved)
+              purchase_state:
+                type: integer
+                description: (reserved)
+              consumption_state:
+                type: integer
+                description: (reserved)
+              auto_renewing:
+                type: boolean
+                description: (reserved)
+              price_currency_code:
+                type: string
+                description: (reserved)
+              price_amount_micros:
+                type: integer
+                description: (reserved)
+              country_code:
+                type: string
+                description: (reserved)
+              payment_state:
+                type: integer
+                description: (reserved)
+              cancel_reason:
+                type: integer
+                description: (reserved)
+              is_trial_period:
+                type: boolean
+                description: for subscription only, whether it is in trial period.
+              original_purchase_date:
+                type: integer
+                description: The Epoch timestamp in milliseconds of original purchase date.
+              expires_date:
+                type: integer
+                description: (subscription only, otherwise 0) The Epoch timestamp in milliseconds of epiration.
+              product_original_purchase_date_ms:
+                type: integer
+                description: The Epoch timestamp in milliseconds of the application's original purchase date.
+              download_id:
+                type: string
+                description: The download id (seems to be the purchase id) of the application receipt, will be '0' for sandbox environment.
+        201:
+          description: (Returns HTTP 200) The receipt is valid, but purchased nothing
+          schema:
+            properties:
+              code:
+                type: integer
+                description: 201 - constant value, indicate the status of validation.
+              status:
+                type: integer
+                description: The status code of the receipt if have.
+              message:
+                type: string
+                description: The detail of the message.
+              product_original_purchase_date_ms:
+                type: integer
+                description: The Epoch timestamp in milliseconds of the application's original purchase date.
+              download_id:
+                type: string
+                description: The download id (seems to be the purchase id) of the application receipt, will be '0' for sandbox environment.
+        202:
+          description: (Returns HTTP 200) The receipt is valid, but target iap-product was not found
+          schema:
+            properties:
+              code:
+                type: integer
+                description: 202 - constant value, indicate the status of validation.
+              status:
+                type: integer
+                description: The status code of the receipt if have.
+              message:
+                type: string
+                description: The detail of the message.
+              product_original_purchase_date_ms:
+                type: integer
+                description: The Epoch timestamp in milliseconds of the application's original purchase date.
+              download_id:
+                type: string
+                description: The download id (seems to be the purchase id) of the application receipt, will be '0' for sandbox environment.
+        default:
+          description: unepected error
+          schema:
+            properties:
+              code:
+                type: integer
+                description: The error code.
+              error:
+                type: string
+                description: The detail of the error.
+              status:
+                type: integer
+                description: The status code of the receipt if have.
+              receipt:
+                type: string
+                description: The receipt JSON from Apple if have.
+  /v2/validate/ios/7/{bundle}/{product_id}:
+    post:
+      description: To verify the status of iOS (IAP/subscription) from the given iOS 7 style receipt.
+      parameters:
+        - name: bundle
+          in: path
+          description: The bundle ID of the application.
+          required: true
+          type: string
+        - name: product_id
+          in: path
+          description: The product ID to validate.
+          required: true
+          type: string
+        - name: receipt
+          in: body
+          description: The base64 encoded string of the Apple receipt.
+          required: true
+          schema:
+            properties:
+              receipt:
+                type: string
+                description: The receipt data
       tags:
         - IAP
         - iOS

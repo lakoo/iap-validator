@@ -2,32 +2,26 @@ const config = require('../config.js');
 const log = require('../log.js');
 
 const iap = require('in-app-purchase');
-const express = require('express');
 
-const router = express.Router();
-
-router.get('/:bundle/:receipt', (req, res) => {
+function validate(bundle, receipt, callback) {
   // Config IAP.
-  if (config.IOS[req.params.bundle] === 'undefined') {
+  if (config.IOS[bundle] === 'undefined') {
     // Invalid configuration.
     log('iOS configuration error.');
-    res.end(JSON.stringify({
+    callback(JSON.stringify({
       code: 102,
       error: 'Configuration error.',
     }));
     return;
   }
-  iap.config(config.IOS[req.params.bundle]);
-
-  // Set up response.
-  res.writeHead(200, { 'Content-Type': 'application/json' });
+  iap.config(config.IOS[bundle]);
 
   // Set up IAP.
   iap.setup((error) => {
     if (error) {
       // Fail to set up IAP.
       log(`iOS initialization error: ${error}`);
-      res.end(JSON.stringify({
+      callback(JSON.stringify({
         code: 102,
         error: `Initialization error: ${error.toString()}`,
       }));
@@ -35,12 +29,12 @@ router.get('/:bundle/:receipt', (req, res) => {
     }
 
     // Validate the IAP.
-    iap.validate(iap.APPLE, req.params.receipt, (appleErr, reply) => {
+    iap.validate(iap.APPLE, receipt, (appleErr, reply) => {
       if (appleErr) {
         // Error from Apple.
         try {
           if (appleErr.message === 'failed to validate for empty purchased list') {
-            res.end(JSON.stringify({
+            callback(JSON.stringify({
               code: 201,
               status: reply.status,
               message: 'the receipt is valid, but purchased nothing',
@@ -49,7 +43,7 @@ router.get('/:bundle/:receipt', (req, res) => {
             }));
           } else {
             log(`iOS verification failed: ${appleErr.toString()}`);
-            res.end(JSON.stringify({
+            callback(JSON.stringify({
               code: 101,
               status: reply.status,
               receipt: JSON.stringify(reply),
@@ -58,7 +52,7 @@ router.get('/:bundle/:receipt', (req, res) => {
           }
         } catch (exception) {
           log(`iOS parsing receipt failed: ${JSON.stringify(reply)}`);
-          res.end(JSON.stringify({
+          callback(JSON.stringify({
             code: 103,
             error: `Verification and parsing receipt failed: ${appleErr.toString()} ${JSON.stringify(reply)}`,
           }));
@@ -79,7 +73,7 @@ router.get('/:bundle/:receipt', (req, res) => {
               throw new Error('Fail to parsing Apple receipt.');
             }
 
-            res.end(JSON.stringify({
+            callback(JSON.stringify({
               code: 0,
               platform: 'iOS',
               type: 'subscription',
@@ -113,7 +107,7 @@ router.get('/:bundle/:receipt', (req, res) => {
               throw new Error('Fail to parsing Apple receipt.');
             }
 
-            res.end(JSON.stringify({
+            callback(JSON.stringify({
               code: 0,
               platform: 'iOS',
               type: 'iap',
@@ -140,7 +134,7 @@ router.get('/:bundle/:receipt', (req, res) => {
           }
         } catch (err) {
           log(`iOS parsing receipt failed: ${JSON.stringify(reply)}`);
-          res.end(JSON.stringify({
+          callback(JSON.stringify({
             code: 103,
             receipt: JSON.stringify(reply),
             error: 'Parsing receipt failed.',
@@ -149,7 +143,7 @@ router.get('/:bundle/:receipt', (req, res) => {
       } else {
         // Validation failed.
         log(`Validation failed: ${JSON.stringify(reply)}`);
-        res.end(JSON.stringify({
+        callback(JSON.stringify({
           code: 104,
           status: reply.status,
           receipt: JSON.stringify(reply),
@@ -158,6 +152,6 @@ router.get('/:bundle/:receipt', (req, res) => {
       }
     });
   });
-});
+}
 
-module.exports = router;
+module.exports = validate;

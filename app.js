@@ -4,9 +4,13 @@ const config = require('./config.js');
 
 const compression = require('compression');
 const express = require('express');
-const googleRouter = require('./google/validate.js');
-const ios6Router = require('./ios/validate6.js');
-const ios7Router = require('./ios/validate7.js');
+const bodyParser = require('body-parser');
+const googleRouterV1 = require('./google/validate_v1.js');
+const googleRouterV2 = require('./google/validate_v2.js');
+const ios6RouterV1 = require('./ios/validate6_v1.js');
+const ios6RouterV2 = require('./ios/validate6_v2.js');
+const ios7RouterV1 = require('./ios/validate7_v1.js');
+const ios7RouterV2 = require('./ios/validate7_v2.js');
 
 const app = express();
 
@@ -24,9 +28,15 @@ if (config.DEBUG) {
 // Support gzip
 app.use(compression());
 
-app.use('/validate/google', googleRouter);
-app.use('/validate/ios/6', ios6Router);
-app.use('/validate/ios/7', ios7Router);
+// Parse body as url encoded form data
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use('/validate/google', googleRouterV1);
+app.use('/v2/validate/google', googleRouterV2);
+app.use('/validate/ios/6', ios6RouterV1);
+app.use('/v2/validate/ios/6', ios6RouterV2);
+app.use('/validate/ios/7', ios7RouterV1);
+app.use('/v2/validate/ios/7', ios7RouterV2);
 
 app.get('/', (req, res) => {
   res.sendStatus(200);
