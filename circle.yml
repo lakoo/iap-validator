@@ -2,6 +2,7 @@ general:
   branches:
     only:
       - master
+      - develop
 
 machine:
   node:
@@ -30,3 +31,8 @@ deployment:
     branch: master
     commands:
       - gcloud -q app deploy
+  staging:
+    branch: develop
+    commands:
+      - gcloud -q app deploy --no-promote --version develop
+
