@@ -11,11 +11,13 @@ machine:
     PORT: 8080
 
 dependencies:
+  cache_directories:
+    - /opt/google-cloud-sdk
   pre:
     - echo $GCLOUD_SERVICE_KEY | base64 --decode > ${HOME}/client-secret.json
-    - gcloud --quiet components update app
-    - gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
-    - gcloud config set project $GCLOUD_PROJECT
+    - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
+    - sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
+    - sudo /opt/google-cloud-sdk/bin/gcloud config set project $GCLOUD_PROJECT
     - rm .gitignore
     - echo $IAP_CONFIG | base64 --decode > config.js
 
@@ -30,9 +32,9 @@ deployment:
   production:
     branch: master
     commands:
-      - gcloud -q app deploy
+      - sudo /opt/google-cloud-sdk/bin/gcloud -q app deploy
   staging:
     branch: develop
     commands:
-      - gcloud -q app deploy --no-promote --version develop
+      - sudo /opt/google-cloud-sdk/bin/gcloud -q app deploy --no-promote --version develop
 
