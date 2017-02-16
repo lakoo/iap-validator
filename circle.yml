@@ -6,7 +6,7 @@ general:
 
 machine:
   node:
-    version: 6.9.2
+    version: 6.9.5
   environment:
     PORT: 8080
 
