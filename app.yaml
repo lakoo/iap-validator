@@ -18,8 +18,5 @@ env: flex
 skip_files:
  - ^node_modules$
 
-automatic_scaling:
-  min_num_instances: 1
-
 env_variables:
   NODE_ENV: production
