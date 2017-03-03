@@ -1,5 +1,7 @@
 # Purchase Validator
 
+[![CircleCI](https://circleci.com/gh/lakoo/iap-validator.svg?style=svg&circle-token=ab4fef9d1a86589516f330d6661bf2e54baf602a)](https://circleci.com/gh/lakoo/iap-validator)
+
 [![Greenkeeper badge](https://badges.greenkeeper.io/lakoo/iap-validator.svg)](https://greenkeeper.io/)
 
 - [Installation](#installation)
