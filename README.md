@@ -1,5 +1,7 @@
 # Purchase Validator
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/lakoo/iap-validator.svg)](https://greenkeeper.io/)
+
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Run Purchase Validator](#run-purchase-validator)
