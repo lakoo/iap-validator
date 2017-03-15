@@ -1,12 +1,14 @@
 machine:
   node:
-    version: 6.9.5
+    version: 6.10.0
   environment:
     PORT: 8080
+    PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
 
 dependencies:
   cache_directories:
     - /opt/google-cloud-sdk
+    - ~/.cache/yarn
   pre:
     - echo $GCLOUD_SERVICE_KEY | base64 --decode > ${HOME}/client-secret.json
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
@@ -14,13 +16,17 @@ dependencies:
     - sudo /opt/google-cloud-sdk/bin/gcloud config set project $GCLOUD_PROJECT
     - rm .gitignore
     - echo $IAP_CONFIG | base64 --decode > config.js
+  override:
+    - yarn install
 
 test:
   post:
-    - npm start:
+    - yarn start:
         background: true
     - sleep 5
     - curl --retry 10 --retry-delay 5 -v http://localhost:8080/
+  override:
+    - yarn test
 
 deployment:
   production:
