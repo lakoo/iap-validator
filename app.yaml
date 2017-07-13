@@ -18,5 +18,9 @@ env: flex
 skip_files:
  - ^node_modules$
 
+resources:
+  cpu: 1
+  memory_gb: 1.0
+
 env_variables:
   NODE_ENV: production
