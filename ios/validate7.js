@@ -58,7 +58,8 @@ function findProductInRenewalInfo(productID, infos) {
   return { autoRenewing, cancelReason };
 }
 
-function validate(bundle, receipt, productID, callback) {
+function validate(bundle, receipt, productID, callback, opts) {
+  if (!opts) opts = {};
   // Config IAP.
   if (config.IOS[bundle] === 'undefined') {
     // Invalid configuration.
@@ -170,6 +171,9 @@ function validate(bundle, receipt, productID, callback) {
             isTrialPeriod = !!JSON.parse(finalReceipt.is_trial_period);
           }
 
+          let lastestReceipt = '';
+          if (opts.get_latest_receipt) lastestReceipt = reply.latest_receipt || '';
+
           callback(JSON.stringify({
             code: 0,
             platform: 'iOS',
@@ -193,6 +197,7 @@ function validate(bundle, receipt, productID, callback) {
             expires_date: ((type === 'subscription') ? latestTime : 0),
             product_original_purchase_date_ms: reply.receipt.original_purchase_date_ms,
             download_id: reply.receipt.download_id.toString(),
+            latest_receipt: lastestReceipt,
           }));
 
           if (config.DEBUG) {

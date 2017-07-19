@@ -3,7 +3,9 @@ const log = require('../log.js');
 
 const iap = require('in-app-purchase');
 
-function validate(bundle, receipt, callback) {
+function validate(bundle, receipt, callback, opts) {
+  if (!opts) opts = {};
+
   // Config IAP.
   if (config.IOS[bundle] === 'undefined') {
     // Invalid configuration.
@@ -73,6 +75,9 @@ function validate(bundle, receipt, callback) {
               throw new Error('Fail to parsing Apple receipt.');
             }
 
+            let lastestReceipt = '';
+            if (opts.get_latest_receipt) lastestReceipt = reply.latest_receipt || '';
+
             callback(JSON.stringify({
               code: 0,
               platform: 'iOS',
@@ -97,6 +102,7 @@ function validate(bundle, receipt, callback) {
               expires_date: parseInt(reply.latest_receipt_info.expires_date, 10),
               product_original_purchase_date_ms: 0,
               download_id: '',
+              latest_receipt: lastestReceipt,
             }));
           } else {  // IAP.
             if (!Object.prototype.hasOwnProperty.call(reply.receipt, 'bid')
@@ -130,6 +136,7 @@ function validate(bundle, receipt, callback) {
               expires_date: 0,
               product_original_purchase_date_ms: 0,
               download_id: '',
+              latest_receipt: '',
             }));
           }
         } catch (err) {
