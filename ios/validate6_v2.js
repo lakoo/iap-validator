@@ -5,8 +5,8 @@ const router = express.Router();
 
 router.post('/:bundle', (req, res) => {
   const opt = {};
-  if (req.query.hasOwnProperty('get_latest_receipt') && req.query.get_latest_receipt !== "false") {
-  	opt.get_latest_receipt = true;
+  if (undefined !== req.query.get_latest_receipt && req.query.get_latest_receipt !== 'false') {
+    opt.get_latest_receipt = true;
   }
   // Set up response.
   res.writeHead(200, { 'Content-Type': 'application/json' });

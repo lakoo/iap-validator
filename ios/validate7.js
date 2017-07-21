@@ -52,14 +52,14 @@ function findProductInRenewalInfo(productID, infos) {
     if (Object.prototype.hasOwnProperty.call(info, 'expiration_intent')) {
       cancelReason = info.expiration_intent;
     }
-    autoRenewing = (info.auto_renew_status === "1");
+    autoRenewing = (info.auto_renew_status === '1');
   }
 
   return { autoRenewing, cancelReason };
 }
 
-function validate(bundle, receipt, productID, callback, opts) {
-  if (!opts) opts = {};
+function validate(bundle, receipt, productID, callback, inOpts) {
+  const opts = inOpts || {};
   // Config IAP.
   if (config.IOS[bundle] === 'undefined') {
     // Invalid configuration.

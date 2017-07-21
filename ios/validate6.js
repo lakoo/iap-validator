@@ -3,8 +3,8 @@ const log = require('../log.js');
 
 const iap = require('in-app-purchase');
 
-function validate(bundle, receipt, callback, opts) {
-  if (!opts) opts = {};
+function validate(bundle, receipt, callback, inOpts) {
+  const opts = inOpts || {};
 
   // Config IAP.
   if (config.IOS[bundle] === 'undefined') {
