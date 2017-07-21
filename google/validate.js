@@ -145,6 +145,7 @@ function validate(reqPurchaseData, callback) {
           expires_date: 0,
           product_original_purchase_date_ms: 0,
           download_id: '',
+          latest_receipt: '',
         }));
       } else if (type === 'subscription') {  // Subscription
         if (!Object.prototype.hasOwnProperty.call(bodyObj, 'startTimeMillis')
@@ -188,6 +189,7 @@ function validate(reqPurchaseData, callback) {
           expires_date: parseInt(bodyObj.expiryTimeMillis, 10),
           product_original_purchase_date_ms: 0,
           download_id: '',
+          latest_receipt: '',
         }));
       }
     });

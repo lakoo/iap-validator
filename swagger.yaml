@@ -18,7 +18,7 @@ produces:
 paths:
   /validate/google/{purchase_data}:
     get:
-      description: To verify the status of iOS (IAP/subscription) from the given Google receipt.
+      description: To verify the status of Android (IAP/subscription) from the given Google receipt.
       parameters:
         - name: purchase_data
           in: path
@@ -100,6 +100,9 @@ paths:
               download_id:
                 type: string
                 description: (reserved)
+              latest_receipt:
+                type: string
+                description: (reserved)
         default:
           description: unepected error
           schema:
@@ -115,7 +118,7 @@ paths:
                 description: The receipt JSON from Google if have.
   /v2/validate/google:
     post:
-      description: To verify the status of iOS (IAP/subscription) from the given Google receipt.
+      description: To verify the status of Android (IAP/subscription) from the given Google receipt.
       parameters:
         - name: purchase_data
           in: body
@@ -201,6 +204,9 @@ paths:
               download_id:
                 type: string
                 description: (reserved)
+              latest_receipt:
+                type: string
+                description: (reserved)
         default:
           description: unepected error
           schema:
@@ -228,6 +234,10 @@ paths:
           description: The urlencoded base64 encoded string of the Apple receipt.
           required: true
           type: string
+        - name: get_latest_receipt
+          in: query
+          type: boolean
+          description: Get latest ios receipt or not.
       tags:
         - IAP
         - iOS
@@ -272,7 +282,7 @@ paths:
                 description: (reserved)
               auto_renewing:
                 type: boolean
-                description: (reserved)
+                description: (subscription only) Whether the subscription will automatically be renewed when it reaches its current expiry time.
               price_currency_code:
                 type: string
                 description: (reserved)
@@ -287,7 +297,7 @@ paths:
                 description: (reserved)
               cancel_reason:
                 type: integer
-                description: (reserved)
+                description: (subscription only) The cancel reason of the subscription, if the subscription is not auto renewing. Possible values are - (-1:No such state, 0:User cancelled the subscription, 1:Subscription was cancelled by the system, for example because of a billing problem).
               is_trial_period:
                 type: boolean
                 description: (reserved)
@@ -301,6 +311,9 @@ paths:
                 type: integer
                 description: (reserved)
               download_id:
+                type: string
+                description: (reserved)
+              latest_receipt:
                 type: string
                 description: (reserved)
         201:
@@ -347,6 +360,10 @@ paths:
           description: The bundle ID of the application.
           required: true
           type: string
+        - name: get_latest_receipt
+          in: query
+          type: boolean
+          description: Get latest ios receipt or not.
         - name: receipt
           in: body
           description: The base64 encoded string of the Apple receipt.
@@ -400,7 +417,7 @@ paths:
                 description: (reserved)
               auto_renewing:
                 type: boolean
-                description: (reserved)
+                description: (subscription only) Whether the subscription will automatically be renewed when it reaches its current expiry time.
               price_currency_code:
                 type: string
                 description: (reserved)
@@ -415,7 +432,7 @@ paths:
                 description: (reserved)
               cancel_reason:
                 type: integer
-                description: (reserved)
+                description: (subscription only) The cancel reason of the subscription, if the subscription is not auto renewing. Possible values are - (1:Customer canceled their subscription, 2:Billing error; for example customer’s payment information was no longer valid, 3:Customer did not agree to a recent price increase, 4:Product was not available for purchase at the time of renewal, 5:Unknown error).
               is_trial_period:
                 type: boolean
                 description: (reserved)
@@ -429,6 +446,9 @@ paths:
                 type: integer
                 description: (reserved)
               download_id:
+                type: string
+                description: (reserved)
+              latest_receipt:
                 type: string
                 description: (reserved)
         201:
@@ -485,6 +505,10 @@ paths:
           description: The product ID to validate.
           required: true
           type: string
+        - name: get_latest_receipt
+          in: query
+          type: boolean
+          description: Get latest ios receipt or not.
       tags:
         - IAP
         - iOS
@@ -529,7 +553,7 @@ paths:
                 description: (reserved)
               auto_renewing:
                 type: boolean
-                description: (reserved)
+                description: (subscription only) Whether the subscription will automatically be renewed when it reaches its current expiry time.
               price_currency_code:
                 type: string
                 description: (reserved)
@@ -544,7 +568,7 @@ paths:
                 description: (reserved)
               cancel_reason:
                 type: integer
-                description: (reserved)
+                description: (subscription only) The cancel reason of the subscription, if the subscription is not auto renewing. Possible values are - (1:Customer canceled their subscription, 2:Billing error; for example customer’s payment information was no longer valid, 3:Customer did not agree to a recent price increase, 4:Product was not available for purchase at the time of renewal, 5:Unknown error).
               is_trial_period:
                 type: boolean
                 description: for subscription only, whether it is in trial period.
@@ -560,6 +584,9 @@ paths:
               download_id:
                 type: string
                 description: The download id (seems to be the purchase id) of the application receipt, will be '0' for sandbox environment.
+              latest_receipt:
+                type: string
+                description: (subscription only, enabled by query string, otherwise empty) The latest base-64 encoded app receipt.
         201:
           description: (Returns HTTP 200) The receipt is valid, but purchased nothing
           schema:
@@ -628,6 +655,10 @@ paths:
           description: The product ID to validate.
           required: true
           type: string
+        - name: get_latest_receipt
+          in: query
+          type: boolean
+          description: Get latest ios receipt or not.
         - name: receipt
           in: body
           description: The base64 encoded string of the Apple receipt.
@@ -681,7 +712,7 @@ paths:
                 description: (reserved)
               auto_renewing:
                 type: boolean
-                description: (reserved)
+                description: (subscription only) Whether the subscription will automatically be renewed when it reaches its current expiry time.
               price_currency_code:
                 type: string
                 description: (reserved)
@@ -696,7 +727,7 @@ paths:
                 description: (reserved)
               cancel_reason:
                 type: integer
-                description: (reserved)
+                description: (subscription only) The cancel reason of the subscription, if the subscription is not auto renewing. Possible values are - (1:Customer canceled their subscription, 2:Billing error; for example customer’s payment information was no longer valid, 3:Customer did not agree to a recent price increase, 4:Product was not available for purchase at the time of renewal, 5:Unknown error).
               is_trial_period:
                 type: boolean
                 description: for subscription only, whether it is in trial period.
@@ -712,6 +743,9 @@ paths:
               download_id:
                 type: string
                 description: The download id (seems to be the purchase id) of the application receipt, will be '0' for sandbox environment.
+              latest_receipt:
+                type: string
+                description: (subscription only, enabled by query string, otherwise empty) The latest base-64 encoded app receipt.
         201:
           description: (Returns HTTP 200) The receipt is valid, but purchased nothing
           schema:

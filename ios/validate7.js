@@ -43,7 +43,23 @@ function findLatestReceipt(productID, receipts) {
   return { receipt: finalReceipt, latest_ms: latestTime, type };
 }
 
-function validate(bundle, receipt, productID, callback) {
+function findProductInRenewalInfo(productID, infos) {
+  let autoRenewing = 0;
+  let cancelReason = 0;
+
+  const info = infos.find(i => i.product_id === productID);
+  if (info) {
+    if (Object.prototype.hasOwnProperty.call(info, 'expiration_intent')) {
+      cancelReason = info.expiration_intent;
+    }
+    autoRenewing = (info.auto_renew_status === "1");
+  }
+
+  return { autoRenewing, cancelReason };
+}
+
+function validate(bundle, receipt, productID, callback, opts) {
+  if (!opts) opts = {};
   // Config IAP.
   if (config.IOS[bundle] === 'undefined') {
     // Invalid configuration.
@@ -143,10 +159,20 @@ function validate(bundle, receipt, productID, callback) {
             return;
           }
 
+          let autoRenewing = false;
+          let cancelReason = 0;
+          if (Object.prototype.hasOwnProperty.call(reply, 'pending_renewal_info')) {
+            const info = findProductInRenewalInfo(productID, reply.pending_renewal_info);
+            ({ autoRenewing, cancelReason } = info);
+          }
+
           let isTrialPeriod = false;
           if (Object.prototype.hasOwnProperty.call(finalReceipt, 'is_trial_period')) {
             isTrialPeriod = !!JSON.parse(finalReceipt.is_trial_period);
           }
+
+          let lastestReceipt = '';
+          if (opts.get_latest_receipt) lastestReceipt = reply.latest_receipt || '';
 
           callback(JSON.stringify({
             code: 0,
@@ -160,17 +186,18 @@ function validate(bundle, receipt, productID, callback) {
             developer_payload: '',
             purchase_state: 0,
             consumption_state: 0,
-            auto_renewing: false,
+            auto_renewing: autoRenewing,
             price_currency_code: '',
             price_amount_micros: 0,
             country_code: '',
             payment_state: 0,
-            cancel_reason: 0,
+            cancel_reason: cancelReason,
             is_trial_period: isTrialPeriod,
             original_purchase_date: parseInt(finalReceipt.original_purchase_date_ms, 10),
             expires_date: ((type === 'subscription') ? latestTime : 0),
             product_original_purchase_date_ms: reply.receipt.original_purchase_date_ms,
             download_id: reply.receipt.download_id.toString(),
+            latest_receipt: lastestReceipt,
           }));
 
           if (config.DEBUG) {
