@@ -104,7 +104,7 @@ function validate(bundle, receipt, callback, inOpts) {
               download_id: '',
               latest_receipt: lastestReceipt,
             }));
-          } else {  // IAP.
+          } else { // IAP.
             if (!Object.prototype.hasOwnProperty.call(reply.receipt, 'bid')
              || !Object.prototype.hasOwnProperty.call(reply.receipt, 'product_id')
              || !Object.prototype.hasOwnProperty.call(reply.receipt, 'transaction_id')
