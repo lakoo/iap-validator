@@ -147,7 +147,7 @@ function validate(reqPurchaseData, callback) {
           download_id: '',
           latest_receipt: '',
         }));
-      } else if (type === 'subscription') {  // Subscription
+      } else if (type === 'subscription') { // Subscription
         if (!Object.prototype.hasOwnProperty.call(bodyObj, 'startTimeMillis')
          || !Object.prototype.hasOwnProperty.call(bodyObj, 'expiryTimeMillis')
          || !Object.prototype.hasOwnProperty.call(bodyObj, 'autoRenewing')
