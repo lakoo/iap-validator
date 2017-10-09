@@ -111,7 +111,7 @@ function validate(bundle, receipt, productID, callback, inOpts) {
           log(`iOS parsing receipt failed: ${JSON.stringify(reply)}`);
           callback(JSON.stringify({
             code: 103,
-            error: `Verification and parsing receipt failed: ${appleErr.toString()} ${JSON.stringify(reply)}`,
+            error: `Verification and parsing receipt failed: ${exception.toString()} ${appleErr.toString()} ${JSON.stringify(reply)}`,
           }));
         }
         return;
@@ -196,7 +196,7 @@ function validate(bundle, receipt, productID, callback, inOpts) {
             original_purchase_date: parseInt(finalReceipt.original_purchase_date_ms, 10),
             expires_date: ((type === 'subscription') ? latestTime : 0),
             product_original_purchase_date_ms: reply.receipt.original_purchase_date_ms,
-            download_id: reply.receipt.download_id.toString(),
+            download_id: (reply.receipt.download_id || 0).toString(),
             latest_receipt: lastestReceipt,
           }));
 
