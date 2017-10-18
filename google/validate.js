@@ -184,7 +184,7 @@ function validate(reqPurchaseData, callback) {
           country_code: bodyObj.countryCode,
           payment_state: paymentState,
           cancel_reason: cancelReason,
-          is_trial_period: false,
+          is_trial_period: (paymentState === 2), // 2 is Free trial
           original_purchase_date: parseInt(bodyObj.startTimeMillis, 10),
           expires_date: parseInt(bodyObj.expiryTimeMillis, 10),
           product_original_purchase_date_ms: 0,
