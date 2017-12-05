@@ -4,6 +4,8 @@
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/lakoo/iap-validator.svg)](https://greenkeeper.io/)
 
+[![NSP Status](https://nodesecurity.io/orgs/lakoo/projects/d1799bc5-f611-4eb5-a040-e87d5650ba04/badge)](https://nodesecurity.io/orgs/lakoo/projects/d1799bc5-f611-4eb5-a040-e87d5650ba04)
+
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Run Purchase Validator](#run-purchase-validator)
