@@ -1,6 +1,6 @@
 const gaeDebug = require('@google-cloud/debug-agent');
 
-const log = require('./log.js');
+const log = require('./log.js').log;
 const config = require('./config.js');
 
 const compression = require('compression');

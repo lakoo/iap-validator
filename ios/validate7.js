@@ -1,5 +1,4 @@
 const config = require('../config.js');
-const log = require('../log.js');
 
 const iap = require('in-app-purchase');
 
@@ -63,11 +62,10 @@ function validate(bundle, receipt, productID, callback, inOpts) {
   // Config IAP.
   if (config.IOS[bundle] === 'undefined') {
     // Invalid configuration.
-    log('iOS configuration error.');
-    callback(JSON.stringify({
+    callback({
       code: 102,
       error: 'Configuration error.',
-    }));
+    });
     return;
   }
   iap.config(config.IOS[bundle]);
@@ -76,11 +74,10 @@ function validate(bundle, receipt, productID, callback, inOpts) {
   iap.setup((error) => {
     if (error) {
       // Fail to set up IAP.
-      log(`iOS initialization error: ${error}`);
-      callback(JSON.stringify({
+      callback({
         code: 102,
         error: `Initialization error: ${error.toString()}`,
-      }));
+      });
       return;
     }
 
@@ -89,30 +86,28 @@ function validate(bundle, receipt, productID, callback, inOpts) {
       if (appleErr) {
         // Error from Apple.
         try {
-          log(`iOS verification failed: ${appleErr.toString()}`);
           if (appleErr.message === 'failed to validate for empty purchased list') {
-            callback(JSON.stringify({
+            callback({
               code: 201,
               status: reply.status,
               message: 'the receipt is valid, but purchased nothing',
               product_original_purchase_date_ms:
                   reply.receipt ? reply.receipt.original_purchase_date_ms : 0,
               download_id: reply.receipt ? reply.receipt.download_id.toString() : '',
-            }));
+            });
           } else {
-            callback(JSON.stringify({
+            callback({
               code: 101,
               status: reply.status,
-              receipt: JSON.stringify(reply),
+              receipt: reply,
               error: `Verification failed: ${appleErr.toString()}`,
-            }));
+            });
           }
         } catch (exception) {
-          log(`iOS parsing receipt failed: ${JSON.stringify(reply)}`);
-          callback(JSON.stringify({
+          callback({
             code: 103,
             error: `Verification and parsing receipt failed: ${exception.toString()} ${appleErr.toString()} ${JSON.stringify(reply)}`,
-          }));
+          });
         }
         return;
       }
@@ -147,15 +142,15 @@ function validate(bundle, receipt, productID, callback, inOpts) {
           }
 
           if (!finalReceipt) {
-            log(`iOS iap product ${productID} not found in receitpt: ${JSON.stringify(reply)}`);
-            callback(JSON.stringify({
+            callback({
               code: 202,
               status: reply.status,
+              receipt: reply,
               message: `the receipt is valid, but target product_id not found: ${productID}`,
               product_original_purchase_date_ms:
                   reply.receipt ? reply.receipt.original_purchase_date_ms : 0,
               download_id: reply.receipt ? reply.receipt.download_id.toString() : '',
-            }));
+            });
             return;
           }
 
@@ -174,7 +169,7 @@ function validate(bundle, receipt, productID, callback, inOpts) {
           let lastestReceipt = '';
           if (opts.get_latest_receipt) lastestReceipt = reply.latest_receipt || '';
 
-          callback(JSON.stringify({
+          callback({
             code: 0,
             platform: 'iOS',
             type,
@@ -198,28 +193,22 @@ function validate(bundle, receipt, productID, callback, inOpts) {
             product_original_purchase_date_ms: reply.receipt.original_purchase_date_ms,
             download_id: (reply.receipt.download_id || 0).toString(),
             latest_receipt: lastestReceipt,
-          }));
-
-          if (config.DEBUG) {
-            log(`iOS7 success receipt log: ${JSON.stringify(reply)}`);
-          }
+          });
         } catch (err) {
-          log(`iOS parsing receipt failed: ${JSON.stringify(reply)}`);
-          callback(JSON.stringify({
+          callback({
             code: 103,
-            receipt: JSON.stringify(reply),
+            receipt: reply,
             error: `Parsing receipt failed (${err.toString()}).`,
-          }));
+          });
         }
       } else {
         // Validation failed.
-        log(`Validation failed: ${JSON.stringify(reply)}`);
-        callback(JSON.stringify({
+        callback({
           code: 104,
           status: reply.status,
-          receipt: JSON.stringify(reply),
+          receipt: reply,
           error: 'Validation failed.',
-        }));
+        });
       }
     });
   });

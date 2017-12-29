@@ -10,4 +10,10 @@ const log = function log(...args) {
   console.log.apply(null, formattedArgs);
 };
 
-module.exports = log;
+const err = function err(...args) {
+  const formattedArgs = args;
+  formattedArgs[0] = `${new Date()}: ${args[0]}`;
+  console.error.apply(null, formattedArgs);
+};
+
+module.exports = { log, errLog: err };

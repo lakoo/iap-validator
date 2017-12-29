@@ -1,7 +1,6 @@
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 
 const config = require('../config.js');
-const log = require('../log.js');
 
 const os = require('os');
 const google = require('googleapis');
@@ -18,29 +17,25 @@ function validate(reqPurchaseData, callback) {
     }
     if (!Object.prototype.hasOwnProperty.call(purchaseData, 'orderId')) purchaseData.orderId = '';
   } catch (err) {
-    log(`Google invalid purchase data: ${reqPurchaseData}`);
-    callback(JSON.stringify({
+    callback({
       code: 102,
       error: `Invalid purchase data: ${reqPurchaseData}`,
-    }));
+    });
     return;
   }
 
   // Config validator.
   if (typeof config.GOOGLE[purchaseData.packageName] === 'undefined') {
     // Invalid configuration.
-    log('Google configuration error.');
-    callback(JSON.stringify({
+    callback({
       code: 102,
       error: 'Configuration error.',
-    }));
+    });
     return;
   }
   const configData = config.GOOGLE[purchaseData.packageName];
 
   const timeoutTimer = setTimeout(() => {
-    log(`Google request timeout ${reqPurchaseData}`);
-
     if (configData.SLACK_URL) {
       const slack = new Slack(configData.SLACK_URL);
       slack.send({
@@ -50,21 +45,20 @@ function validate(reqPurchaseData, callback) {
       });
     }
 
-    callback(JSON.stringify({
+    callback({
       code: 110,
       error: `Request timeout: ${reqPurchaseData}`,
-    }));
+    });
   }, config.TIMEOUT);
 
   const jwtClient = new google.auth.JWT(configData.EMAIL, null, configData.KEY, ['https://www.googleapis.com/auth/androidpublisher'], null);
   jwtClient.authorize((err, tokens) => {
     if (err) {
-      log(`Google verification failed: ${err.toString()}`);
-      callback(JSON.stringify({
+      callback({
         code: 101,
         receipt: reqPurchaseData,
         error: `Verification failed: ${err.toString()}`,
-      }));
+      });
       return;
     }
 
@@ -89,12 +83,11 @@ function validate(reqPurchaseData, callback) {
     requestGoogleAPI(params, (err2, bodyObj) => {
       clearTimeout(timeoutTimer);
       if (err2) {
-        log(`Google verification failed: ${err2.toString()}`);
-        callback(JSON.stringify({
+        callback({
           code: 101,
           receipt: reqPurchaseData,
           error: `Verification failed: ${err2.toString()}`,
-        }));
+        });
         return;
       }
       if (!Object.prototype.hasOwnProperty.call(bodyObj, 'kind')
@@ -122,7 +115,7 @@ function validate(reqPurchaseData, callback) {
           consumptionState = parseInt(bodyObj.consumptionState, 10);
         }
 
-        callback(JSON.stringify({
+        callback({
           code: 0,
           platform: 'Google',
           type: 'iap',
@@ -146,7 +139,7 @@ function validate(reqPurchaseData, callback) {
           product_original_purchase_date_ms: 0,
           download_id: '',
           latest_receipt: '',
-        }));
+        });
       } else if (type === 'subscription') { // Subscription
         if (!Object.prototype.hasOwnProperty.call(bodyObj, 'startTimeMillis')
          || !Object.prototype.hasOwnProperty.call(bodyObj, 'expiryTimeMillis')
@@ -166,7 +159,7 @@ function validate(reqPurchaseData, callback) {
           cancelReason = parseInt(bodyObj.cancelReason, 10);
         }
 
-        callback(JSON.stringify({
+        callback({
           code: 0,
           platform: 'Google',
           type: 'subscription',
@@ -190,7 +183,7 @@ function validate(reqPurchaseData, callback) {
           product_original_purchase_date_ms: 0,
           download_id: '',
           latest_receipt: '',
-        }));
+        });
       }
     });
   });
