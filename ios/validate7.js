@@ -128,17 +128,21 @@ function validate(bundle, receipt, productID, callback, inOpts) {
           // Handle 'latest_receipt_info', deprecated field
           if (Object.prototype.hasOwnProperty.call(reply, 'latest_receipt_info')) {
             const output = findLatestReceipt(productID, reply.latest_receipt_info);
-            finalReceipt = output.receipt;
-            latestTime = output.latest_ms;
-            type = output.type;
+            ({
+              receipt: finalReceipt,
+              latest_ms: latestTime,
+              type,
+            } = output);
           }
 
           // Handle 'in_app'
           const output = findLatestReceipt(productID, reply.receipt.in_app);
           if (output.latest_ms > latestTime) {
-            finalReceipt = output.receipt;
-            latestTime = output.latest_ms;
-            type = output.type;
+            ({
+              receipt: finalReceipt,
+              latest_ms: latestTime,
+              type,
+            } = output);
           }
 
           if (!finalReceipt) {
