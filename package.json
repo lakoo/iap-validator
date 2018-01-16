@@ -3,7 +3,7 @@
   "version": "1.2.0",
   "description": "Use to validate the purchase (IAP and subscription) from Apple Store and Google Play Store",
   "engines": {
-    "node": ">=8.1.4 <9.0.0"
+    "node": ">=8.1.4"
   },
   "main": "app.js",
   "dependencies": {
