@@ -7,9 +7,11 @@ const google = require('googleapis');
 const Slack = require('node-slack');
 
 function validate(reqPurchaseData, callback) {
-  let purchaseData = '';
+  let purchaseData = reqPurchaseData;
   try {
-    purchaseData = JSON.parse(reqPurchaseData);
+    if (typeof reqPurchaseData === 'string') {
+      purchaseData = JSON.parse(reqPurchaseData);
+    }
     if (!Object.prototype.hasOwnProperty.call(purchaseData, 'packageName')
      || !Object.prototype.hasOwnProperty.call(purchaseData, 'productId')
      || !Object.prototype.hasOwnProperty.call(purchaseData, 'purchaseToken')) {
