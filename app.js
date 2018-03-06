@@ -33,6 +33,7 @@ app.use(compression());
 
 // Parse body as url encoded form data
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+app.use(bodyParser.json({ limit: '10mb' }));
 
 app.use('/validate/google', googleRouterV1);
 app.use('/v2/validate/google', googleRouterV2);

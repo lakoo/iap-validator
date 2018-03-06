@@ -7,9 +7,11 @@ const google = require('googleapis');
 const Slack = require('node-slack');
 
 function validate(reqPurchaseData, callback) {
-  let purchaseData = '';
+  let purchaseData = reqPurchaseData;
   try {
-    purchaseData = JSON.parse(reqPurchaseData);
+    if (typeof reqPurchaseData === 'string') {
+      purchaseData = JSON.parse(reqPurchaseData);
+    }
     if (!Object.prototype.hasOwnProperty.call(purchaseData, 'packageName')
      || !Object.prototype.hasOwnProperty.call(purchaseData, 'productId')
      || !Object.prototype.hasOwnProperty.call(purchaseData, 'purchaseToken')) {
@@ -122,8 +124,8 @@ function validate(reqPurchaseData, callback) {
           app_id: purchaseData.packageName,
           product_id: purchaseData.productId,
           status: 0,
-          transaction_id: purchaseData.orderId,
-          original_transaction_id: purchaseData.orderId,
+          transaction_id: purchaseData.orderId || bodyObj.orderId,
+          original_transaction_id: purchaseData.orderId || bodyObj.orderId,
           developer_payload: bodyObj.developerPayload,
           purchase_state: purchaseState,
           consumption_state: consumptionState,
@@ -166,8 +168,8 @@ function validate(reqPurchaseData, callback) {
           app_id: purchaseData.packageName,
           product_id: purchaseData.productId,
           status: 0,
-          transaction_id: purchaseData.orderId,
-          original_transaction_id: purchaseData.orderId,
+          transaction_id: purchaseData.orderId || bodyObj.orderId,
+          original_transaction_id: purchaseData.orderId || bodyObj.orderId,
           developer_payload: bodyObj.developerPayload,
           purchase_state: -1,
           consumption_state: -1,
