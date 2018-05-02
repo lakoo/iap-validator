@@ -85,6 +85,14 @@ function validate(reqPurchaseData, callback) {
     requestGoogleAPI(params, (err2, bodyObj) => {
       clearTimeout(timeoutTimer);
       if (err2) {
+        if (err2.code === 410) {
+          callback({
+            code: 203,
+            receipt: reqPurchaseData,
+            error: `the receipt is valid, but expired more than 60 dyas: ${err2.toString()}`,
+          });
+          return;
+        }
         callback({
           code: 101,
           receipt: reqPurchaseData,
