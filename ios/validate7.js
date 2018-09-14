@@ -1,6 +1,6 @@
-const config = require('../config.js');
-
 const iap = require('in-app-purchase');
+
+const config = require('../config.js');
 
 function findLatestReceipt(productID, receipts) {
   let finalReceipt = null;

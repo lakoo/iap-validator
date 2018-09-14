@@ -1,11 +1,11 @@
 const gaeDebug = require('@google-cloud/debug-agent');
 
-const { log } = require('./log.js');
-const config = require('./config.js');
-
 const compression = require('compression');
 const express = require('express');
 const bodyParser = require('body-parser');
+
+const { log } = require('./log.js');
+const config = require('./config.js');
 const googleRouterV1 = require('./google/validate_v1.js');
 const googleRouterV2 = require('./google/validate_v2.js');
 const ios6RouterV1 = require('./ios/validate6_v1.js');

@@ -1,10 +1,9 @@
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 
-const config = require('../config.js');
-
 const os = require('os');
 const google = require('googleapis');
 const Slack = require('node-slack');
+const config = require('../config.js');
 
 function validate(reqPurchaseData, callback) {
   let purchaseData = reqPurchaseData;
