@@ -47,6 +47,6 @@ jobs:
               gcloud -q app deploy
             fi
             if [ "${CIRCLE_BRANCH}" == "develop" ]; then
-              gcloud -q app deploy --no-promote --version develop
+              gcloud -q app deploy ~/lakoo-iap-validator/app.develop.yaml --no-promote --version develop
             fi
 
