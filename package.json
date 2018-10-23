@@ -11,8 +11,8 @@
     "body-parser": "^1.16.1",
     "compression": "^1.6.2",
     "express": "^4.14.1",
-    "googleapis": "^23.0.0",
-    "in-app-purchase": "^1.1.11",
+    "googleapis": "^23.0.2",
+    "in-app-purchase": "^1.10.0",
     "node-slack": "0.0.7"
   },
   "devDependencies": {
