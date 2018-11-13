@@ -1,6 +1,6 @@
-const config = require('../config.js');
-
 const iap = require('in-app-purchase');
+
+const config = require('../config.js');
 
 function validate(bundle, receipt, callback, inOpts) {
   const opts = inOpts || {};

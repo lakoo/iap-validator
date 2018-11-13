@@ -1,6 +1,6 @@
+const express = require('express');
 const validate = require('./validate7.js');
 const { errLog } = require('../log.js');
-const express = require('express');
 
 const router = express.Router();
 
