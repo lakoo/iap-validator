@@ -66,10 +66,10 @@ function validate(reqPurchaseData, callback) {
     let requestGoogleAPI = null;
     let type = '';
     if (Object.prototype.hasOwnProperty.call(purchaseData, 'autoRenewing')) {
-      requestGoogleAPI = google.androidpublisher('v2').purchases.subscriptions;
+      requestGoogleAPI = google.androidpublisher('v3').purchases.subscriptions;
       type = 'subscription';
     } else {
-      requestGoogleAPI = google.androidpublisher('v2').purchases.products;
+      requestGoogleAPI = google.androidpublisher('v3').purchases.products;
       type = 'iap';
     }
 
