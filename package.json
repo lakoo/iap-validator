@@ -13,7 +13,8 @@
     "express": "^4.16.4",
     "googleapis": "^39.2.0",
     "in-app-purchase": "^1.11.3",
-    "node-slack": "0.0.7"
+    "node-slack": "0.0.7",
+    "snyk": "^1.232.0"
   },
   "devDependencies": {
     "eslint": "^5.5.0",
@@ -24,6 +25,9 @@
   "scripts": {
     "start": "node app.js",
     "lint": "eslint app.js log.js google/*.js ios/*.js",
-    "test": "npm run lint"
-  }
+    "test": "npm run lint",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
