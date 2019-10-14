@@ -191,7 +191,7 @@ function validate(reqPurchaseData, callback) {
           callback({
             code: 203,
             receipt: reqPurchaseData,
-            error: `the receipt is valid, but expired more than 60 dyas: ${err2.toString()}`,
+            error: `the receipt is valid, but expired more than 60 days: ${err2.toString()}`,
           });
         } else {
           callback({
