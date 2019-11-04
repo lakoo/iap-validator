@@ -49,4 +49,57 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "develop" ]; then
               gcloud -q app deploy ~/lakoo-iap-validator/app.develop.yaml --no-promote --version develop
             fi
-
+  lint:
+    working_directory: ~/lakoo-iap-validator
+    docker:
+      - image: lakoo/node-alpine-gcloud
+    environment:
+      - PORT: 8080
+    steps:
+      - checkout
+      - restore_cache:
+          key: lakoo-iap-validator-lint-{{ checksum "package.json" }}
+      - run:
+          name: Prepare configs for test
+          command: |
+            mv config.js.sample config.js
+      - run:
+          name: Dependencies
+          command: |
+            export PATH=${PATH}:"~/lakoo-iap-validator/node_modules/.bin"
+            apk add --no-cache curl
+            yarn install
+      - run:
+          name: Lint Test
+          command: yarn test
+      - run:
+          name: Start Test
+          command: yarn start
+          background: true
+      - run:
+          name: Curl Test
+          command: |
+            sleep 5
+            curl --retry 10 --retry-delay 5 -v http://localhost:8080/
+      - save_cache:
+          key: lakoo-iap-validator-lint-{{ checksum "package.json" }}
+          paths:
+            - "~/.cache/yarn"
+workflows:
+  version: 2
+  lint_only:
+    jobs:
+      - lint:
+          filters:
+            branches:
+              ignore:
+                - develop
+                - master
+  build_and_or_deploy:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - develop
+                - master
