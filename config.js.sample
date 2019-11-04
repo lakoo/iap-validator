@@ -7,17 +7,17 @@ config['PORT'] = 8080;
 config['TIMEOUT'] = 5 * 1000; //in ms
 
 config['GOOGLE'] = {
-	<The package name as key>: {
-		'EMAIL': <The email for Google Play service account, see https://developers.google.com/android-publisher/getting_started#using_a_service_account>,
-		'KEY': <The private key for Google Play service account, see https://developers.google.com/android-publisher/getting_started#using_a_service_account>,
-		'SLACK_URL': <The URL of slack incoming webhook, sends slack notification when timeout>,
+	'<The package name as key>': {
+		'EMAIL': '<The email for Google Play service account, see https://developers.google.com/android-publisher/getting_started#using_a_service_account>',
+		'KEY': '<The private key for Google Play service account, see https://developers.google.com/android-publisher/getting_started#using_a_service_account>',
+		'SLACK_URL': '<The URL of slack incoming webhook, sends slack notification when timeout>',
 	}
 };
 
 config['IOS'] = {
-	<The bundle ID as key>: {
+	'<The bundle ID as key>': {
 		verbose: config['DEBUG'],
-		applePassword: <The apple password for subscription from iTunes Connect>
+		applePassword: '<The apple password for subscription from iTunes Connect>'
 	},
 };
 module.exports = config;
