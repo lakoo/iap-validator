@@ -44,9 +44,9 @@ jobs:
           name: Deploy
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              gcloud -q app deploy
+              gcloud functions deploy iap-validator --region asia-northeast1 --trigger-http --entry-point app --runtime nodejs8
             fi
             if [ "${CIRCLE_BRANCH}" == "develop" ]; then
-              gcloud -q app deploy ~/lakoo-iap-validator/app.develop.yaml --no-promote --version develop
+              gcloud functions deploy iap-validator-develop --region asia-northeast1 --trigger-http --entry-point app --runtime nodejs8
             fi
 

@@ -13,7 +13,7 @@ const ios6RouterV2 = require('./ios/validate6_v2.js');
 const ios7RouterV1 = require('./ios/validate7_v1.js');
 const ios7RouterV2 = require('./ios/validate7_v2.js');
 
-if (process.env.GAE_VERSION) gaeDebug.start();
+if (process.env.GAE_INSTANCE) gaeDebug.start();
 
 const app = express();
 
@@ -46,6 +46,12 @@ app.get('/', (req, res) => {
   res.sendStatus(200);
 });
 
-const server = app.listen(process.env.PORT || config.PORT, () => {
-  log('Purchase Validator is running on port: %s', server.address().port);
-});
+if (!(process.env.K_SERVICE || process.env.FUNCTION_NAME)) {
+  const server = app.listen(process.env.PORT || config.PORT, () => {
+    log('Purchase Validator is running on port: %s', server.address().port);
+  });
+}
+
+module.exports = {
+  app,
+};
