@@ -186,6 +186,7 @@ function validate(reqPurchaseData, callback) {
         }
       })
       .catch((err2) => {
+        clearTimeout(timeoutTimer);
         if (err2.code === 410) {
           callback({
             code: 203,
