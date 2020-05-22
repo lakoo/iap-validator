@@ -46,7 +46,7 @@ function findProductInRenewalInfo(productID, infos) {
   let autoRenewing = 0;
   let cancelReason = 0;
 
-  const info = infos.find(i => i.product_id === productID);
+  const info = infos.find((i) => i.product_id === productID);
   if (info) {
     if (Object.prototype.hasOwnProperty.call(info, 'expiration_intent')) {
       cancelReason = info.expiration_intent;
