@@ -20,10 +20,10 @@ jobs:
           name: Deploy
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              gcloud functions deploy iap-validator --region asia-northeast1 --trigger-http --entry-point app --runtime nodejs10
+              gcloud functions deploy iap-validator --region asia-northeast1 --trigger-http --entry-point app --runtime nodejs10 --memory=512
             fi
             if [ "${CIRCLE_BRANCH}" == "deployment/feature" ]; then
-              gcloud functions deploy iap-validator-develop --region asia-northeast1 --trigger-http --entry-point app --runtime nodejs10
+              gcloud functions deploy iap-validator-develop --region asia-northeast1 --trigger-http --entry-point app --runtime nodejs10 --memory=512
             fi
   lint:
     working_directory: ~/lakoo-iap-validator
