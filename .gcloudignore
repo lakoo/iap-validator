@@ -15,3 +15,7 @@
 .circleci
 
 node_modules
+yarn.lock
+.eslintrc.js
+*.md
+*.yaml
